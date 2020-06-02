@@ -1,0 +1,125 @@
+﻿<Window x:Name="frm_Main" x:Class="Slide_Kinect.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Slide_Kinect"
+        mc:Ignorable="d"
+        Title="Slide Kinect" Height="410" Width="670" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <StackPanel HorizontalAlignment="Left" Margin="12,12,0,0" VerticalAlignment="Top" Orientation="Horizontal">
+            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Border Background="#FFF3F3F3" BorderBrush="#FFD8D8D8" BorderThickness="1" Height="240">
+                    <Image x:Name="img_Videos" Stretch="None" Source="Camera.png" Margin="-1" Height="240" Width="383"/>
+                </Border>
+                <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,5,0,0">
+                    <GroupBox Header="View Mode" HorizontalAlignment="Left" VerticalAlignment="Top">
+                        <StackPanel Margin="10,10,12,10" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
+                            <StackPanel VerticalAlignment="Center" Margin="0,0,20,0">
+                                <RadioButton x:Name="rdb_RGBColor" Content="RGB Color" Margin="0,0,0,8" IsChecked="True"/>
+                                <RadioButton x:Name="rdb_Infrared" Content="Infrared"/>
+                            </StackPanel>
+                            <StackPanel VerticalAlignment="Center">
+                                <CheckBox x:Name="cbx_Skeleton" Content="Draw skeleton" Margin="0,0,0,8"/>
+                                <CheckBox x:Name="cbx_Outline" Content="Draw outline" Margin="0,0,0,8"/>
+                                <CheckBox x:Name="cbx_FingerPoints" Content="Draw finger points"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Header="Actions" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="12,0,0,0">
+                        <StackPanel Margin="10,10,12,10" HorizontalAlignment="Left" VerticalAlignment="Top">
+                            <CheckBox x:Name="cbx_NextSlide" Content="Next slide" Margin="0,0,0,8"/>
+                            <CheckBox x:Name="cbx_PreviousSlide" Content="Previous slide" Margin="0,0,0,8"/>
+                            <CheckBox x:Name="cbx_CursorMode" Content="Cursor mode"/>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="12,-10,0,0">
+                <GroupBox Header="Metadata" HorizontalAlignment="Left" VerticalAlignment="Top" Width="237" Margin="0,0,0,5">
+                    <StackPanel Margin="6,2,6,6" VerticalAlignment="Top">
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="Status:"/>
+                            <Label x:Name="lbl_Status" Content="Disconnected" Foreground="Red" Background="Transparent"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="Kinnect ID:"/>
+                            <Label x:Name="lbl_KinectID" Content="Not provided" Foreground="Red"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox HorizontalAlignment="Left" VerticalAlignment="Top" Width="237" Margin="0,0,0,5">
+                    <GroupBox.Header>
+                        <RadioButton Content="Right Handed" IsChecked="True" GroupName="Handed"/>
+                    </GroupBox.Header>
+                    <StackPanel Margin="6,2,6,6" VerticalAlignment="Top" Orientation="Horizontal">
+                        <StackPanel VerticalAlignment="Top">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="World X:"/>
+                                <Label x:Name="lbl_WorldXRight" Content="NULL" Foreground="Red"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="World Y:"/>
+                                <Label x:Name="lbl_WorldYRight" Content="NULL" Foreground="Red"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="World Z:"/>
+                                <Label x:Name="lbl_WorldZRight" Content="NULL" Foreground="Red"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel VerticalAlignment="Top">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="Relative X:"/>
+                                <Label x:Name="lbl_RelativeXRight" Content="NULL" Foreground="Red"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="Relative Y:"/>
+                                <Label x:Name="lbl_RelativeYRight" Content="NULL" Foreground="Red"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="Relative Z:"/>
+                                <Label x:Name="lbl_RelativeZRight" Content="NULL" Foreground="Red"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox HorizontalAlignment="Left" VerticalAlignment="Top" Width="237" Margin="0,0,0,12">
+                    <GroupBox.Header>
+                        <RadioButton Content="Left Handed" GroupName="Handed"/>
+                    </GroupBox.Header>
+                    <StackPanel Margin="6,2,6,6" VerticalAlignment="Top" Orientation="Horizontal">
+                        <StackPanel VerticalAlignment="Top">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="World X:"/>
+                                <Label x:Name="lbl_WorldXLeft" Content="NULL" Foreground="Red"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="World Y:"/>
+                                <Label x:Name="lbl_WorldYLeft" Content="NULL" Foreground="Red"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="World Z:"/>
+                                <Label x:Name="lbl_WorldZLeft" Content="NULL" Foreground="Red"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel VerticalAlignment="Top">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="Relative X:"/>
+                                <Label x:Name="lbl_RelativeXLeft" Content="NULL" Foreground="Red"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="Relative Y:"/>
+                                <Label x:Name="lbl_RelativeYLeft" Content="NULL" Foreground="Red"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="Relative Z:"/>
+                                <Label x:Name="lbl_RelativeZLeft" Content="NULL" Foreground="Red"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+                <Button x:Name="btn_Switch" Content="Start" HorizontalAlignment="Left" Height="37" VerticalAlignment="Top" Width="237"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

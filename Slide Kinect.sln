@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30105.148
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slide Kinect", "Slide Kinect.csproj", "{0F00DD72-3E5E-468C-9F59-A5525B40C082}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0F00DD72-3E5E-468C-9F59-A5525B40C082}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F00DD72-3E5E-468C-9F59-A5525B40C082}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F00DD72-3E5E-468C-9F59-A5525B40C082}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F00DD72-3E5E-468C-9F59-A5525B40C082}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {139264C5-CB50-40D1-903C-89A777E3F327}
+	EndGlobalSection
+EndGlobal
