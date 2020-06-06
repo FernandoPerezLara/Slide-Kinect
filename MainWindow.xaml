@@ -5,19 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Slide_Kinect"
         mc:Ignorable="d"
-        Title="Slide Kinect" Height="410" Width="670" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen">
+        Title="Slide Kinect" Height="410" Width="670" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Closing="frm_Main_Closing">
     <Grid>
         <StackPanel HorizontalAlignment="Left" Margin="12,12,0,0" VerticalAlignment="Top" Orientation="Horizontal">
             <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
                 <Border Background="#FFF3F3F3" BorderBrush="#FFD8D8D8" BorderThickness="1" Height="240">
-                    <Image x:Name="img_Videos" Stretch="None" Source="Camera.png" Margin="-1" Height="240" Width="383"/>
+                    <Image x:Name="img_Videos" Stretch="None" Source="Resources/Camera.png" Margin="-1" Height="240" Width="383"/>
                 </Border>
                 <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,5,0,0">
                     <GroupBox Header="View Mode" HorizontalAlignment="Left" VerticalAlignment="Top">
                         <StackPanel Margin="10,10,12,10" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
                             <StackPanel VerticalAlignment="Center" Margin="0,0,20,0">
-                                <RadioButton x:Name="rdb_RGBColor" Content="RGB Color" Margin="0,0,0,8" IsChecked="True"/>
-                                <RadioButton x:Name="rdb_Infrared" Content="Infrared"/>
+                                <RadioButton x:Name="rdb_RGBColor" Content="RGB Color" Margin="0,0,0,8" IsChecked="True" Checked="rdb_RGBColor_Checked"/>
+                                <RadioButton x:Name="rdb_Infrared" Content="Infrared" Checked="rdb_Infrared_Checked"/>
                             </StackPanel>
                             <StackPanel VerticalAlignment="Center">
                                 <CheckBox x:Name="cbx_Skeleton" Content="Draw skeleton" Margin="0,0,0,8"/>
@@ -118,7 +118,7 @@
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
-                <Button x:Name="btn_Switch" Content="Start" HorizontalAlignment="Left" Height="37" VerticalAlignment="Top" Width="237"/>
+                <Button x:Name="btn_Switch" Content="Start" HorizontalAlignment="Left" Height="37" VerticalAlignment="Top" Width="237" Click="btn_Switch_Click"/>
             </StackPanel>
         </StackPanel>
     </Grid>

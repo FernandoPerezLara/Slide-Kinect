@@ -13,3 +13,21 @@ C:\Users\ferna\OneDrive\Desarrollo\C#\Slide Kinect\Slide Kinect\obj\Debug\Slide 
 C:\Users\ferna\OneDrive\Desarrollo\C#\Slide Kinect\Slide Kinect\obj\Debug\Slide Kinect.csproj.CoreCompileInputs.cache
 C:\Users\ferna\OneDrive\Desarrollo\C#\Slide Kinect\Slide Kinect\obj\Debug\Slide Kinect.exe
 C:\Users\ferna\OneDrive\Desarrollo\C#\Slide Kinect\Slide Kinect\obj\Debug\Slide Kinect.pdb
+C:\Users\ferna\OneDrive\Desarrollo\C#\Slide Kinect\obj\Debug\Slide Kinect.csprojAssemblyReference.cache
+C:\Users\ferna\OneDrive\Desarrollo\C#\Slide Kinect\obj\Debug\MainWindow.g.cs
+C:\Users\ferna\OneDrive\Desarrollo\C#\Slide Kinect\obj\Debug\App.g.cs
+C:\Users\ferna\OneDrive\Desarrollo\C#\Slide Kinect\obj\Debug\Slide Kinect_MarkupCompile.cache
+C:\Users\ferna\OneDrive\Desarrollo\C#\Slide Kinect\obj\Debug\Slide Kinect_MarkupCompile.lref
+C:\Users\ferna\OneDrive\Desarrollo\C#\Slide Kinect\obj\Debug\Slide Kinect.exe
+C:\Users\ferna\OneDrive\Desarrollo\C#\Slide Kinect\obj\Debug\Slide Kinect.pdb
+C:\Users\ferna\OneDrive\Desarrollo\C#\Slide Kinect\bin\Debug\Slide Kinect.exe.config
+C:\Users\ferna\OneDrive\Desarrollo\C#\Slide Kinect\bin\Debug\Slide Kinect.exe
+C:\Users\ferna\OneDrive\Desarrollo\C#\Slide Kinect\bin\Debug\Slide Kinect.pdb
+C:\Users\ferna\OneDrive\Desarrollo\C#\Slide Kinect\bin\Debug\Microsoft.Kinect.dll
+C:\Users\ferna\OneDrive\Desarrollo\C#\Slide Kinect\bin\Debug\Microsoft.Kinect.xml
+C:\Users\ferna\OneDrive\Desarrollo\C#\Slide Kinect\obj\Debug\MainWindow.baml
+C:\Users\ferna\OneDrive\Desarrollo\C#\Slide Kinect\obj\Debug\Slide Kinect.g.resources
+C:\Users\ferna\OneDrive\Desarrollo\C#\Slide Kinect\obj\Debug\Slide_Kinect.Properties.Resources.resources
+C:\Users\ferna\OneDrive\Desarrollo\C#\Slide Kinect\obj\Debug\Slide Kinect.csproj.GenerateResource.cache
+C:\Users\ferna\OneDrive\Desarrollo\C#\Slide Kinect\obj\Debug\Slide Kinect.csproj.CoreCompileInputs.cache
+C:\Users\ferna\OneDrive\Desarrollo\C#\Slide Kinect\obj\Debug\Slide Kinect.csproj.CopyComplete
