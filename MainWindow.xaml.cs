@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 using Microsoft.Kinect;
 
 namespace Slide_Kinect {
@@ -17,7 +18,7 @@ namespace Slide_Kinect {
             InitializeComponent();
         }
 
-        public enum cameraMode { color, infrared }
+        private enum cameraMode { color, infrared }
 
         private void btn_Switch_Click(object sender, RoutedEventArgs e) {
             if (isOpen == false) {
@@ -37,11 +38,16 @@ namespace Slide_Kinect {
             camera = cameraMode.infrared;
         }
 
-        private void frm_Main_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+        private void frm_Main_Closed(object sender, EventArgs e) {
+            if (kinectReader != null) {
+                kinectReader.Dispose();
+            }
+
             if (kinectSensor != null) {
                 kinectSensor.Close();
-                interfaceStatus(2);
             }
+
+            interfaceStatus(2);
         }
 
         private void kinectStart() {
@@ -71,7 +77,7 @@ namespace Slide_Kinect {
             using (var frame = reference.ColorFrameReference.AcquireFrame()) {
                 if (frame != null) {
                     if (camera == cameraMode.color) {
-                        img_Videos.Source = frame.kinectOutput();
+                        img_Video.Source = frame.kinectOutput();
                     }
                 }
             }
@@ -79,13 +85,14 @@ namespace Slide_Kinect {
             using (var frame = reference.InfraredFrameReference.AcquireFrame()) {
                 if (frame != null) {
                     if (camera == cameraMode.infrared) {
-                        img_Videos.Source = frame.kinectOutput();
+                        img_Video.Source = frame.kinectOutput();
                     }
                 }
             }
 
             using (var frame = reference.BodyFrameReference.AcquireFrame()) {
                 if (frame != null) {
+                    cnv_Video.Children.Clear();
                     handPosition(frame);
                 }
             }
@@ -114,7 +121,11 @@ namespace Slide_Kinect {
                     lbl_WorldXLeft.Content = (leftHand.Position.X).ToString("0.00");
                     lbl_WorldYLeft.Content = (leftHand.Position.Y).ToString("0.00");
                     lbl_WorldZLeft.Content = (leftHand.Position.Z).ToString("0.00");
-                }                
+
+                    if (cbx_Skeleton.IsChecked == true) {
+                        cnv_Video.drawSkeleton(body);
+                    }
+                }
             }
         }
 
@@ -161,7 +172,7 @@ namespace Slide_Kinect {
                     lbl_RelativeYLeft.Content = "0.00";
                     lbl_RelativeZLeft.Foreground = Brushes.Black;
                     lbl_RelativeZLeft.Content = "0.00";
-                    img_Videos.Stretch = Stretch.UniformToFill;
+                    img_Video.Stretch = Stretch.UniformToFill;
 
                     break;
                 case 1:
@@ -200,8 +211,8 @@ namespace Slide_Kinect {
                     lbl_RelativeYLeft.Content = "NULL";
                     lbl_RelativeZLeft.Foreground = Brushes.Red;
                     lbl_RelativeZLeft.Content = "NULL";
-                    img_Videos.Stretch = Stretch.None;
-                    img_Videos.Source = new BitmapImage(new Uri(@"/Resources/Camera.png", UriKind.Relative));
+                    img_Video.Stretch = Stretch.None;
+                    img_Video.Source = new BitmapImage(new Uri(@"/Resources/Camera.png", UriKind.Relative));
 
                     break;
             }
@@ -241,6 +252,102 @@ namespace Slide_Kinect {
             }
 
             return BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgr32, null, data, width * PixelFormats.Bgr32.BitsPerPixel / 8);
+        }
+
+        public static void drawSkeleton(this Canvas cnv_Video, Body body) {
+            if (body == null) return;
+
+            foreach (Joint joint in body.Joints.Values) {
+                cnv_Video.drawPoint(joint);
+            }
+
+            cnv_Video.drawLine(body.Joints[JointType.Head], body.Joints[JointType.Neck]);
+            cnv_Video.drawLine(body.Joints[JointType.Neck], body.Joints[JointType.SpineShoulder]);
+            cnv_Video.drawLine(body.Joints[JointType.SpineShoulder], body.Joints[JointType.ShoulderLeft]);
+            cnv_Video.drawLine(body.Joints[JointType.SpineShoulder], body.Joints[JointType.ShoulderRight]);
+            cnv_Video.drawLine(body.Joints[JointType.SpineShoulder], body.Joints[JointType.SpineMid]);
+            cnv_Video.drawLine(body.Joints[JointType.ShoulderLeft], body.Joints[JointType.ElbowLeft]);
+            cnv_Video.drawLine(body.Joints[JointType.ShoulderRight], body.Joints[JointType.ElbowRight]);
+            cnv_Video.drawLine(body.Joints[JointType.ElbowLeft], body.Joints[JointType.WristLeft]);
+            cnv_Video.drawLine(body.Joints[JointType.ElbowRight], body.Joints[JointType.WristRight]);
+            cnv_Video.drawLine(body.Joints[JointType.WristLeft], body.Joints[JointType.HandLeft]);
+            cnv_Video.drawLine(body.Joints[JointType.WristRight], body.Joints[JointType.HandRight]);
+            cnv_Video.drawLine(body.Joints[JointType.HandLeft], body.Joints[JointType.HandTipLeft]);
+            cnv_Video.drawLine(body.Joints[JointType.HandRight], body.Joints[JointType.HandTipRight]);
+            cnv_Video.drawLine(body.Joints[JointType.HandTipLeft], body.Joints[JointType.ThumbLeft]);
+            cnv_Video.drawLine(body.Joints[JointType.HandTipRight], body.Joints[JointType.ThumbRight]);
+            cnv_Video.drawLine(body.Joints[JointType.SpineMid], body.Joints[JointType.SpineBase]);
+            cnv_Video.drawLine(body.Joints[JointType.SpineBase], body.Joints[JointType.HipLeft]);
+            cnv_Video.drawLine(body.Joints[JointType.SpineBase], body.Joints[JointType.HipRight]);
+            cnv_Video.drawLine(body.Joints[JointType.HipLeft], body.Joints[JointType.KneeLeft]);
+            cnv_Video.drawLine(body.Joints[JointType.HipRight], body.Joints[JointType.KneeRight]);
+            cnv_Video.drawLine(body.Joints[JointType.KneeLeft], body.Joints[JointType.AnkleLeft]);
+            cnv_Video.drawLine(body.Joints[JointType.KneeRight], body.Joints[JointType.AnkleRight]);
+            cnv_Video.drawLine(body.Joints[JointType.AnkleLeft], body.Joints[JointType.FootLeft]);
+            cnv_Video.drawLine(body.Joints[JointType.AnkleRight], body.Joints[JointType.FootRight]);
+        }
+
+        public static void drawPoint(this Canvas cnv_Video, Joint joint) {
+            if (joint.TrackingState == TrackingState.NotTracked) return;
+
+            joint = joint.scaleTo(cnv_Video.ActualWidth, cnv_Video.ActualHeight);
+
+            Ellipse ellipse = new Ellipse {
+                Width = 10,
+                Height = 10,
+                Fill = new SolidColorBrush(Colors.LightBlue)
+            };
+
+            Canvas.SetLeft(ellipse, joint.Position.X - ellipse.Width / 2);
+            Canvas.SetTop(ellipse, joint.Position.Y - ellipse.Height / 2);
+
+            cnv_Video.Children.Add(ellipse);
+        }
+
+        public static void drawLine(this Canvas canvas, Joint first, Joint second) {
+            if (first.TrackingState == TrackingState.NotTracked || second.TrackingState == TrackingState.NotTracked) return;
+
+            first = first.scaleTo(canvas.ActualWidth, canvas.ActualHeight);
+            second = second.scaleTo(canvas.ActualWidth, canvas.ActualHeight);
+
+            Line line = new Line {
+                X1 = first.Position.X,
+                Y1 = first.Position.Y,
+                X2 = second.Position.X,
+                Y2 = second.Position.Y,
+                StrokeThickness = 6,
+                Stroke = new SolidColorBrush(Colors.LightBlue)
+            };
+
+            canvas.Children.Add(line);
+        }
+
+        public static Joint scaleTo(this Joint joint, double width, double height, float skeletonMaxX, float skeletonMaxY) {
+            joint.Position = new CameraSpacePoint {
+                X = scale(width, skeletonMaxX, joint.Position.X),
+                Y = scale(height, skeletonMaxY, -joint.Position.Y),
+                Z = joint.Position.Z
+            };
+
+            return joint;
+        }
+
+        public static Joint scaleTo(this Joint joint, double width, double height) {
+            return scaleTo(joint, width, height, 1.0f, 1.0f);
+        }
+
+        private static float scale(double maxPixel, double maxSkeleton, float position) {
+            float value = (float)((((maxPixel / maxSkeleton) / 2) * position) + (maxPixel / 2));
+
+            if (value > maxPixel) {
+                return (float)maxPixel;
+            }
+
+            if (value < 0) {
+                return 0;
+            }
+
+            return value;
         }
     }
 }

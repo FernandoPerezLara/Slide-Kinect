@@ -5,12 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Slide_Kinect"
         mc:Ignorable="d"
-        Title="Slide Kinect" Height="410" Width="670" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Closing="frm_Main_Closing">
+        Title="Slide Kinect" Height="410" Width="670" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Closed="frm_Main_Closed">
     <Grid>
         <StackPanel HorizontalAlignment="Left" Margin="12,12,0,0" VerticalAlignment="Top" Orientation="Horizontal">
             <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
                 <Border Background="#FFF3F3F3" BorderBrush="#FFD8D8D8" BorderThickness="1" Height="240">
-                    <Image x:Name="img_Videos" Stretch="None" Source="Resources/Camera.png" Margin="-1" Height="240" Width="383"/>
+                    <Grid Height="240" Width="383" Margin="-1">
+                        <Image x:Name="img_Video" Stretch="None" Source="Resources/Camera.png" />
+                        <Canvas x:Name="cnv_Video" Panel.ZIndex="1"/>
+                    </Grid>
                 </Border>
                 <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,5,0,0">
                     <GroupBox Header="View Mode" HorizontalAlignment="Left" VerticalAlignment="Top">
