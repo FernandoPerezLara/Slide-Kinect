@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -93,38 +94,7 @@ namespace Slide_Kinect {
             using (var frame = reference.BodyFrameReference.AcquireFrame()) {
                 if (frame != null) {
                     cnv_Video.Children.Clear();
-                    handPosition(frame);
-                }
-            }
-        }
-
-        private void handPosition(BodyFrame frame) {
-            IList<Body> bodies = new Body[frame.BodyFrameSource.BodyCount];
-            IReadOnlyDictionary<JointType, Joint> joints;
-            Dictionary<JointType, Point> joinPoints;
-            Joint rightHand, leftHand;
-
-            frame.GetAndRefreshBodyData(bodies);
-
-            foreach (Body body in bodies) {
-                if (body != null && body.IsTracked) {
-                    joints = body.Joints;
-                    joinPoints = new Dictionary<JointType, Point>();
-
-                    rightHand = joints[JointType.HandTipRight];
-                    leftHand = joints[JointType.HandTipLeft];
-
-                    lbl_WorldXRight.Content = (rightHand.Position.X).ToString("0.00");
-                    lbl_WorldYRight.Content = (rightHand.Position.Y).ToString("0.00");
-                    lbl_WorldZRight.Content = (rightHand.Position.Z).ToString("0.00");
-
-                    lbl_WorldXLeft.Content = (leftHand.Position.X).ToString("0.00");
-                    lbl_WorldYLeft.Content = (leftHand.Position.Y).ToString("0.00");
-                    lbl_WorldZLeft.Content = (leftHand.Position.Z).ToString("0.00");
-
-                    if (cbx_Skeleton.IsChecked == true) {
-                        cnv_Video.drawSkeleton(body);
-                    }
+                    cnv_Video.bodyPosition(frame, lbl_WorldXRight, lbl_WorldYRight, lbl_WorldZRight, lbl_WorldXLeft, lbl_WorldYLeft, lbl_WorldZLeft, cbx_Skeleton);
                 }
             }
         }
@@ -254,42 +224,61 @@ namespace Slide_Kinect {
             return BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgr32, null, data, width * PixelFormats.Bgr32.BitsPerPixel / 8);
         }
 
-        public static void drawSkeleton(this Canvas cnv_Video, Body body) {
-            if (body == null) return;
+        public static void bodyPosition(this Canvas cnv_Video, BodyFrame frame, Label lbl_WorldXRight, Label lbl_WorldYRight, Label lbl_WorldZRight, Label lbl_WorldXLeft, Label lbl_WorldYLeft, Label lbl_WorldZLeft, CheckBox cbx_Skeleton) {
+            IList<Body> bodies = new Body[frame.BodyFrameSource.BodyCount];
+            IReadOnlyDictionary<JointType, Joint> joints;
 
-            foreach (Joint joint in body.Joints.Values) {
-                cnv_Video.drawPoint(joint);
+            frame.GetAndRefreshBodyData(bodies);
+
+            foreach (Body body in bodies) {
+                if (body != null && body.IsTracked) {
+                    joints = body.Joints;
+
+                    lbl_WorldXRight.Content = (joints[JointType.HandTipRight].Position.X).ToString("0.00");
+                    lbl_WorldYRight.Content = (joints[JointType.HandTipRight].Position.Y).ToString("0.00");
+                    lbl_WorldZRight.Content = (joints[JointType.HandTipRight].Position.Z).ToString("0.00");
+
+                    lbl_WorldXLeft.Content = (joints[JointType.HandTipLeft].Position.X).ToString("0.00");
+                    lbl_WorldYLeft.Content = (joints[JointType.HandTipLeft].Position.Y).ToString("0.00");
+                    lbl_WorldZLeft.Content = (joints[JointType.HandTipLeft].Position.Z).ToString("0.00");
+
+                    if (cbx_Skeleton.IsChecked == true) {
+                        foreach (Joint joint in body.Joints.Values) {
+                            cnv_Video.drawNode(joint);
+                        }
+
+                        cnv_Video.drawLine(body.Joints[JointType.Head], body.Joints[JointType.Neck]);
+                        cnv_Video.drawLine(body.Joints[JointType.Neck], body.Joints[JointType.SpineShoulder]);
+                        cnv_Video.drawLine(body.Joints[JointType.SpineShoulder], body.Joints[JointType.ShoulderLeft]);
+                        cnv_Video.drawLine(body.Joints[JointType.SpineShoulder], body.Joints[JointType.ShoulderRight]);
+                        cnv_Video.drawLine(body.Joints[JointType.SpineShoulder], body.Joints[JointType.SpineMid]);
+                        cnv_Video.drawLine(body.Joints[JointType.ShoulderLeft], body.Joints[JointType.ElbowLeft]);
+                        cnv_Video.drawLine(body.Joints[JointType.ShoulderRight], body.Joints[JointType.ElbowRight]);
+                        cnv_Video.drawLine(body.Joints[JointType.ElbowLeft], body.Joints[JointType.WristLeft]);
+                        cnv_Video.drawLine(body.Joints[JointType.ElbowRight], body.Joints[JointType.WristRight]);
+                        cnv_Video.drawLine(body.Joints[JointType.WristLeft], body.Joints[JointType.HandLeft]);
+                        cnv_Video.drawLine(body.Joints[JointType.WristRight], body.Joints[JointType.HandRight]);
+                        cnv_Video.drawLine(body.Joints[JointType.HandLeft], body.Joints[JointType.HandTipLeft]);
+                        cnv_Video.drawLine(body.Joints[JointType.HandRight], body.Joints[JointType.HandTipRight]);
+                        cnv_Video.drawLine(body.Joints[JointType.HandTipLeft], body.Joints[JointType.ThumbLeft]);
+                        cnv_Video.drawLine(body.Joints[JointType.HandTipRight], body.Joints[JointType.ThumbRight]);
+                        cnv_Video.drawLine(body.Joints[JointType.SpineMid], body.Joints[JointType.SpineBase]);
+                        cnv_Video.drawLine(body.Joints[JointType.SpineBase], body.Joints[JointType.HipLeft]);
+                        cnv_Video.drawLine(body.Joints[JointType.SpineBase], body.Joints[JointType.HipRight]);
+                        cnv_Video.drawLine(body.Joints[JointType.HipLeft], body.Joints[JointType.KneeLeft]);
+                        cnv_Video.drawLine(body.Joints[JointType.HipRight], body.Joints[JointType.KneeRight]);
+                        cnv_Video.drawLine(body.Joints[JointType.KneeLeft], body.Joints[JointType.AnkleLeft]);
+                        cnv_Video.drawLine(body.Joints[JointType.KneeRight], body.Joints[JointType.AnkleRight]);
+                        cnv_Video.drawLine(body.Joints[JointType.AnkleLeft], body.Joints[JointType.FootLeft]);
+                        cnv_Video.drawLine(body.Joints[JointType.AnkleRight], body.Joints[JointType.FootRight]);
+                    }
+                }
             }
-
-            cnv_Video.drawLine(body.Joints[JointType.Head], body.Joints[JointType.Neck]);
-            cnv_Video.drawLine(body.Joints[JointType.Neck], body.Joints[JointType.SpineShoulder]);
-            cnv_Video.drawLine(body.Joints[JointType.SpineShoulder], body.Joints[JointType.ShoulderLeft]);
-            cnv_Video.drawLine(body.Joints[JointType.SpineShoulder], body.Joints[JointType.ShoulderRight]);
-            cnv_Video.drawLine(body.Joints[JointType.SpineShoulder], body.Joints[JointType.SpineMid]);
-            cnv_Video.drawLine(body.Joints[JointType.ShoulderLeft], body.Joints[JointType.ElbowLeft]);
-            cnv_Video.drawLine(body.Joints[JointType.ShoulderRight], body.Joints[JointType.ElbowRight]);
-            cnv_Video.drawLine(body.Joints[JointType.ElbowLeft], body.Joints[JointType.WristLeft]);
-            cnv_Video.drawLine(body.Joints[JointType.ElbowRight], body.Joints[JointType.WristRight]);
-            cnv_Video.drawLine(body.Joints[JointType.WristLeft], body.Joints[JointType.HandLeft]);
-            cnv_Video.drawLine(body.Joints[JointType.WristRight], body.Joints[JointType.HandRight]);
-            cnv_Video.drawLine(body.Joints[JointType.HandLeft], body.Joints[JointType.HandTipLeft]);
-            cnv_Video.drawLine(body.Joints[JointType.HandRight], body.Joints[JointType.HandTipRight]);
-            cnv_Video.drawLine(body.Joints[JointType.HandTipLeft], body.Joints[JointType.ThumbLeft]);
-            cnv_Video.drawLine(body.Joints[JointType.HandTipRight], body.Joints[JointType.ThumbRight]);
-            cnv_Video.drawLine(body.Joints[JointType.SpineMid], body.Joints[JointType.SpineBase]);
-            cnv_Video.drawLine(body.Joints[JointType.SpineBase], body.Joints[JointType.HipLeft]);
-            cnv_Video.drawLine(body.Joints[JointType.SpineBase], body.Joints[JointType.HipRight]);
-            cnv_Video.drawLine(body.Joints[JointType.HipLeft], body.Joints[JointType.KneeLeft]);
-            cnv_Video.drawLine(body.Joints[JointType.HipRight], body.Joints[JointType.KneeRight]);
-            cnv_Video.drawLine(body.Joints[JointType.KneeLeft], body.Joints[JointType.AnkleLeft]);
-            cnv_Video.drawLine(body.Joints[JointType.KneeRight], body.Joints[JointType.AnkleRight]);
-            cnv_Video.drawLine(body.Joints[JointType.AnkleLeft], body.Joints[JointType.FootLeft]);
-            cnv_Video.drawLine(body.Joints[JointType.AnkleRight], body.Joints[JointType.FootRight]);
         }
+    }
 
-        public static void drawPoint(this Canvas cnv_Video, Joint joint) {
-            if (joint.TrackingState == TrackingState.NotTracked) return;
-
+    public static class drawSkeleton {
+        public static void drawNode(this Canvas cnv_Video, Joint joint) {
             joint = joint.scaleTo(cnv_Video.ActualWidth, cnv_Video.ActualHeight);
 
             Ellipse ellipse = new Ellipse {
