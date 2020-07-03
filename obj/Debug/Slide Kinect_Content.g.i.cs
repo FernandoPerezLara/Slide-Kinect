@@ -8,6 +8,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("camera.png")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("save.png")]
 
 

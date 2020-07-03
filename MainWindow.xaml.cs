@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
@@ -14,12 +14,25 @@ namespace Slide_Kinect {
         private MultiSourceFrameReader kinectReader;
         private static bool isOpen = false;
         private cameraMode camera = cameraMode.color;
+        private bool depurationMode = true;
 
         public MainWindow() {
             InitializeComponent();
         }
 
         private enum cameraMode { color, infrared }
+
+        private void frm_Main_KeyDown(object sender, System.Windows.Input.KeyEventArgs e) {
+            if (Keyboard.IsKeyDown(Key.LeftAlt) && (Keyboard.IsKeyDown(Key.D))) {
+                depurationMode = !depurationMode;
+
+                if (depurationMode == true) {
+                    stb_Depuration.Visibility = Visibility.Visible;
+                } else {
+                    stb_Depuration.Visibility = Visibility.Hidden;
+                }
+            }
+        }
 
         private void btn_Switch_Click(object sender, RoutedEventArgs e) {
             if (isOpen == false) {
@@ -183,6 +196,8 @@ namespace Slide_Kinect {
                     lbl_RelativeZLeft.Content = "NULL";
                     img_Video.Stretch = Stretch.None;
                     img_Video.Source = new BitmapImage(new Uri(@"/Resources/Camera.png", UriKind.Relative));
+                    img_Video.Stretch = Stretch.None;
+                    cnv_Video.Children.Clear();
 
                     break;
             }
@@ -242,6 +257,8 @@ namespace Slide_Kinect {
                     lbl_WorldYLeft.Content = (joints[JointType.HandTipLeft].Position.Y).ToString("0.00");
                     lbl_WorldZLeft.Content = (joints[JointType.HandTipLeft].Position.Z).ToString("0.00");
 
+                    readHands(joints, cnv_Video);
+
                     if (cbx_Skeleton.IsChecked == true) {
                         foreach (Joint joint in body.Joints.Values) {
                             cnv_Video.drawNode(joint);
@@ -273,6 +290,21 @@ namespace Slide_Kinect {
                         cnv_Video.drawLine(body.Joints[JointType.AnkleRight], body.Joints[JointType.FootRight]);
                     }
                 }
+            }
+        }
+
+        public static void readHands(IReadOnlyDictionary<JointType, Joint> joints, Canvas cnv_Video) {
+            CameraSpacePoint leftHand, leftElbow;
+                
+            leftHand = joints[JointType.HandLeft].Position;
+            leftElbow = joints[JointType.ElbowLeft].Position;
+
+            if ((Math.Abs(leftHand.X - leftElbow.X) <= 0.05) && (Math.Abs(leftHand.Y) > Math.Abs(leftElbow.Y)) && (Math.Abs(leftHand.Z - leftElbow.Z) <= 0.1)) {
+                cnv_Video.Background = Brushes.Green;
+                cnv_Video.Opacity = 0.2;
+            } else {
+                cnv_Video.Background = Brushes.Red;
+                cnv_Video.Opacity = 0.2;
             }
         }
     }
