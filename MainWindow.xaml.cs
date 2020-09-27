@@ -20,7 +20,7 @@ namespace Slide_Kinect {
             InitializeComponent();
         }
 
-        private enum cameraMode { color, infrared }
+        private enum cameraMode { color, infrared, depth }
 
         private void frm_Main_KeyDown(object sender, System.Windows.Input.KeyEventArgs e) {
             if (Keyboard.IsKeyDown(Key.LeftAlt) && (Keyboard.IsKeyDown(Key.D))) {
@@ -52,6 +52,10 @@ namespace Slide_Kinect {
             camera = cameraMode.infrared;
         }
 
+        private void rdb_Depth_Checked(object sender, RoutedEventArgs e) {
+            camera = cameraMode.depth;
+        }
+
         private void frm_Main_Closed(object sender, EventArgs e) {
             if (kinectReader != null) {
                 kinectReader.Dispose();
@@ -68,7 +72,7 @@ namespace Slide_Kinect {
             kinectSensor = KinectSensor.GetDefault();
 
             if (kinectSensor != null) {
-                kinectReader = kinectSensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Infrared | FrameSourceTypes.Body);
+                kinectReader = kinectSensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Infrared | FrameSourceTypes.Depth | FrameSourceTypes.Body);
                 kinectReader.MultiSourceFrameArrived += KinectReader_MultiSourceFrameArrived; ;
 
                 kinectSensor.Open();
@@ -103,6 +107,14 @@ namespace Slide_Kinect {
             using (var frame = reference.InfraredFrameReference.AcquireFrame()) {
                 if (frame != null) {
                     if (camera == cameraMode.infrared) {
+                        img_Video.Source = frame.kinectOutput();
+                    }
+                }
+            }
+
+            using (var frame = reference.DepthFrameReference.AcquireFrame()) {
+                if (frame != null) {
+                    if (camera == cameraMode.depth) {
                         img_Video.Source = frame.kinectOutput();
                     }
                 }
@@ -239,6 +251,28 @@ namespace Slide_Kinect {
                 data[position++] = (byte)(frameData[i] >> 7);
                 data[position++] = (byte)(frameData[i] >> 7);
                 data[position++] = (byte)(frameData[i] >> 7);
+
+                position++;
+            }
+
+            return BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgr32, null, data, width * PixelFormats.Bgr32.BitsPerPixel / 8);
+        }
+
+        public static ImageSource kinectOutput(this DepthFrame frame) {
+            int width = frame.FrameDescription.Width;
+            int height = frame.FrameDescription.Height;
+            byte[] data = new byte[width * height * (PixelFormats.Bgr32.BitsPerPixel + 7) / 8];
+            ushort[] frameData = new ushort[width * height];
+            ushort minDepth = frame.DepthMinReliableDistance;
+            ushort maxDepth = frame.DepthMaxReliableDistance;
+            int position = 0;
+
+            frame.CopyFrameDataToArray(frameData);
+
+            for (int i = 0; i < frameData.Length; i++) {
+                data[position++] = (byte)(frameData[i] >= minDepth && frameData[i] <= maxDepth ? frameData[i] : 0);
+                data[position++] = (byte)(frameData[i] >= minDepth && frameData[i] <= maxDepth ? frameData[i] : 0);
+                data[position++] = (byte)(frameData[i] >= minDepth && frameData[i] <= maxDepth ? frameData[i] : 0);
 
                 position++;
             }

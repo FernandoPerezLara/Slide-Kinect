@@ -20,7 +20,8 @@
                         <StackPanel Margin="10,10,12,10" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
                             <StackPanel VerticalAlignment="Center" Margin="0,0,20,0">
                                 <RadioButton x:Name="rdb_RGBColor" Content="RGB Color" Margin="0,0,0,8" IsChecked="True" Checked="rdb_RGBColor_Checked"/>
-                                <RadioButton x:Name="rdb_Infrared" Content="Infrared" Checked="rdb_Infrared_Checked"/>
+                                <RadioButton x:Name="rdb_Infrared" Content="Infrared" Margin="0,0,0,8" Checked="rdb_Infrared_Checked"/>
+                                <RadioButton x:Name="rdb_Depth" Content="Depth" Margin="0,0,0,0" Checked="rdb_Depth_Checked"/>
                             </StackPanel>
                             <StackPanel VerticalAlignment="Center">
                                 <CheckBox x:Name="cbx_Skeleton" Content="Draw skeleton" Margin="0,0,0,8"/>
