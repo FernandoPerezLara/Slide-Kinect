@@ -24,15 +24,15 @@
                             </StackPanel>
                             <StackPanel VerticalAlignment="Center">
                                 <CheckBox x:Name="cbx_Skeleton" Content="Draw skeleton" Margin="0,0,0,8"/>
-                                <CheckBox x:Name="cbx_Outline" Content="Draw outline" Margin="0,0,0,8" IsEnabled="False"/>
+                                <CheckBox x:Name="cbx_Outline" Content="Green screen" Margin="0,0,0,8" IsEnabled="False"/>
                                 <CheckBox x:Name="cbx_FingerPoints" Content="Draw finger points" IsEnabled="False"/>
                             </StackPanel>
                         </StackPanel>
                     </GroupBox>
                     <GroupBox Header="Actions" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="12,0,0,0">
                         <StackPanel Margin="10,10,12,10" HorizontalAlignment="Left" VerticalAlignment="Top">
-                            <CheckBox x:Name="cbx_NextSlide" Content="Next slide" Margin="0,0,0,8"/>
-                            <CheckBox x:Name="cbx_PreviousSlide" Content="Previous slide" Margin="0,0,0,8"/>
+                            <CheckBox x:Name="cbx_NextSlide" Content="Next slide" Margin="0,0,0,8" IsChecked="True"/>
+                            <CheckBox x:Name="cbx_PreviousSlide" Content="Previous slide" Margin="0,0,0,8" IsChecked="True"/>
                             <CheckBox x:Name="cbx_CursorMode" Content="Cursor mode"/>
                         </StackPanel>
                     </GroupBox>
@@ -129,7 +129,7 @@
                 <TextBlock>Output:</TextBlock>
             </StatusBarItem>
             <StatusBarItem>
-                <TextBlock>No output messages</TextBlock>
+                <TextBlock x:Name="txt_Output">No output messages</TextBlock>
             </StatusBarItem>
             <StatusBarItem HorizontalAlignment="Right" VerticalAlignment="Center">
                 <Image VerticalAlignment="Center" Height="16" Width="16" Source="Resources/Save.png"/>

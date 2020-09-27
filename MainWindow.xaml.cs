@@ -83,6 +83,10 @@ namespace Slide_Kinect {
             isOpen = false;
         }
 
+        private void sendMessage(string content) {
+            txt_Output.Text = content;
+        }
+
         private void KinectReader_MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e) {
             var reference = e.FrameReference.AcquireFrame();
 
@@ -115,6 +119,7 @@ namespace Slide_Kinect {
         private void interfaceStatus(int status) {
             switch (status) {
                 case 0:
+                    sendMessage("Kinnect connected");
                     lbl_Status.Foreground = Brushes.Green;
                     lbl_Status.Content = "Connected";
                     lbl_KinectID.Foreground = Brushes.Black;
@@ -159,12 +164,14 @@ namespace Slide_Kinect {
 
                     break;
                 case 1:
+                    sendMessage("Connecting Kinect");
                     btn_Switch.Content = "Stop";
                     lbl_Status.Foreground = Brushes.Orange;
                     lbl_Status.Content = "Connecting";
 
                     break;
                 case 2:
+                    sendMessage("Kinect disconnected");
                     btn_Switch.Content = "Start";
                     lbl_Status.Foreground = Brushes.Red;
                     lbl_Status.Content = "Disconnected";
@@ -299,10 +306,12 @@ namespace Slide_Kinect {
             leftHand = joints[JointType.HandLeft].Position;
             leftElbow = joints[JointType.ElbowLeft].Position;
 
-            if ((Math.Abs(leftHand.X - leftElbow.X) <= 0.05) && (Math.Abs(leftHand.Y) > Math.Abs(leftElbow.Y)) && (Math.Abs(leftHand.Z - leftElbow.Z) <= 0.1)) {
+            if ((Math.Abs(leftHand.X - leftElbow.X) <= 0.05) && (leftHand.Y > leftElbow.Y) && (Math.Abs(leftHand.Z - leftElbow.Z) <= 0.1)) {
+                // Action arm activated
                 cnv_Video.Background = Brushes.Green;
                 cnv_Video.Opacity = 0.2;
             } else {
+                // Action arm desactivated
                 cnv_Video.Background = Brushes.Red;
                 cnv_Video.Opacity = 0.2;
             }
