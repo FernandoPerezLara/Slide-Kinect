@@ -18,4 +18,4 @@ In order to run *Slide Kinect* you need to perform the following steps:
 # Contribution
 This project is currently in development, you can find errors, it would be appreciated if they were commented in the [issues](https://github.com/FernandoPerezLara/Slide-Kinect/issues) section.
 
-You are free to modify the code to improve and upload it on [pull requests](https://github.com/FernandoPerezLara/Slide-Kinect/pulls) and I am recognized as a developer and the project.
+You are free to modify the code to improve and upload it on [pull requests](https://github.com/FernandoPerezLara/Slide-Kinect/pulls) as long as I am recognized as the developer of this project.
