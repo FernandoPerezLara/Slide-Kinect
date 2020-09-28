@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -123,7 +124,7 @@ namespace Slide_Kinect {
             using (var frame = reference.BodyFrameReference.AcquireFrame()) {
                 if (frame != null) {
                     cnv_Video.Children.Clear();
-                    cnv_Video.bodyPosition(frame, lbl_WorldXRight, lbl_WorldYRight, lbl_WorldZRight, lbl_WorldXLeft, lbl_WorldYLeft, lbl_WorldZLeft, cbx_Skeleton);
+                    cnv_Video.bodyPosition(frame, lbl_WorldXRight, lbl_WorldYRight, lbl_WorldZRight, lbl_WorldXLeft, lbl_WorldYLeft, lbl_WorldZLeft, cbx_Skeleton, cbx_NextSlide, cbx_PreviousSlide);
                 }
             }
         }
@@ -224,6 +225,10 @@ namespace Slide_Kinect {
     }
 
     public static class CameraReader {
+        [DllImport("user32.dll")]
+        public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, uint dwExtraInfo);
+        public static bool changeSlide = false;
+
         public static ImageSource kinectOutput(this ColorFrame frame) {
             int width = frame.FrameDescription.Width;
             int height = frame.FrameDescription.Height;
@@ -280,7 +285,7 @@ namespace Slide_Kinect {
             return BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgr32, null, data, width * PixelFormats.Bgr32.BitsPerPixel / 8);
         }
 
-        public static void bodyPosition(this Canvas cnv_Video, BodyFrame frame, Label lbl_WorldXRight, Label lbl_WorldYRight, Label lbl_WorldZRight, Label lbl_WorldXLeft, Label lbl_WorldYLeft, Label lbl_WorldZLeft, CheckBox cbx_Skeleton) {
+        public static void bodyPosition(this Canvas cnv_Video, BodyFrame frame, Label lbl_WorldXRight, Label lbl_WorldYRight, Label lbl_WorldZRight, Label lbl_WorldXLeft, Label lbl_WorldYLeft, Label lbl_WorldZLeft, CheckBox cbx_Skeleton, CheckBox cbx_NextSlide, CheckBox cbx_PreviousSlide) {
             IList<Body> bodies = new Body[frame.BodyFrameSource.BodyCount];
             IReadOnlyDictionary<JointType, Joint> joints;
 
@@ -298,7 +303,7 @@ namespace Slide_Kinect {
                     lbl_WorldYLeft.Content = (joints[JointType.HandTipLeft].Position.Y).ToString("0.00");
                     lbl_WorldZLeft.Content = (joints[JointType.HandTipLeft].Position.Z).ToString("0.00");
 
-                    readHands(joints, cnv_Video);
+                    readHands(joints, cnv_Video, cbx_NextSlide, cbx_PreviousSlide);
 
                     if (cbx_Skeleton.IsChecked == true) {
                         foreach (Joint joint in body.Joints.Values) {
@@ -334,20 +339,43 @@ namespace Slide_Kinect {
             }
         }
 
-        public static void readHands(IReadOnlyDictionary<JointType, Joint> joints, Canvas cnv_Video) {
+        public static void readHands(IReadOnlyDictionary<JointType, Joint> joints, Canvas cnv_Video, CheckBox cbx_NextSlide, CheckBox cbx_PreviousSlide) {
             CameraSpacePoint leftHand, leftElbow;
                 
             leftHand = joints[JointType.HandLeft].Position;
             leftElbow = joints[JointType.ElbowLeft].Position;
 
             if ((Math.Abs(leftHand.X - leftElbow.X) <= 0.05) && (leftHand.Y > leftElbow.Y) && (Math.Abs(leftHand.Z - leftElbow.Z) <= 0.1)) {
-                // Action arm activated
+                shakeHand(joints[JointType.HandRight].Position, joints[JointType.ElbowRight].Position, cbx_NextSlide, cbx_PreviousSlide);
                 cnv_Video.Background = Brushes.Green;
                 cnv_Video.Opacity = 0.2;
             } else {
-                // Action arm desactivated
                 cnv_Video.Background = Brushes.Red;
                 cnv_Video.Opacity = 0.2;
+            }
+        }
+
+        
+
+        public static void shakeHand(CameraSpacePoint rightHand, CameraSpacePoint rightElbow, CheckBox cbx_NextSlide, CheckBox cbx_PreviousSlide) {
+            if ((rightElbow.X - rightHand.X) >= 0.2) {
+                if (changeSlide == false) {
+                    if (cbx_NextSlide.IsChecked == true) {
+                        keybd_event((byte)0x27, 0, 0x0001 | 0, 0);
+                    }
+                    changeSlide = true;
+                }
+            } else if ((rightElbow.X - rightHand.X) <= -0.2) {
+                if (changeSlide == false) {
+                    if (cbx_PreviousSlide.IsChecked == true) {
+                        keybd_event((byte)0x25, 0, 0x0001 | 0, 0);
+                    }
+                    changeSlide = true;
+                }
+            } else {
+                if (changeSlide == true) {
+                    changeSlide = false;
+                }
             }
         }
     }
