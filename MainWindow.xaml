@@ -5,13 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Slide_Kinect"
         mc:Ignorable="d"
-        Title="Slide Kinect" Height="432" Width="670" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Closed="frm_Main_Closed" KeyDown="frm_Main_KeyDown">
+        Title="Slide Kinect" Height="410" Width="670" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Closed="frm_Main_Closed">
     <Grid>
         <StackPanel HorizontalAlignment="Left" Margin="12,12,0,0" VerticalAlignment="Top" Orientation="Horizontal">
             <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
                 <Border Background="#FFF3F3F3" BorderBrush="#FFD8D8D8" BorderThickness="1" Height="240">
                     <Grid Height="240" Width="383" Margin="-1">
-                        <Image x:Name="img_Video" Stretch="None" Source="Resources/Camera.png" />
+                        <Image x:Name="img_Video" Stretch="None" Source="Resources/Camera.png"/>
                         <Canvas x:Name="cnv_Video" Panel.ZIndex="1"/>
                     </Grid>
                 </Border>
@@ -125,17 +125,6 @@
                 <Button x:Name="btn_Switch" Content="Start" HorizontalAlignment="Left" Height="37" VerticalAlignment="Top" Width="237" Click="btn_Switch_Click"/>
             </StackPanel>
         </StackPanel>
-        <StatusBar x:Name="stb_Depuration" VerticalAlignment="Bottom">
-            <StatusBarItem>
-                <TextBlock>Output:</TextBlock>
-            </StatusBarItem>
-            <StatusBarItem>
-                <TextBlock x:Name="txt_Output">No output messages</TextBlock>
-            </StatusBarItem>
-            <StatusBarItem HorizontalAlignment="Right" VerticalAlignment="Center">
-                <Image VerticalAlignment="Center" Height="16" Width="16" Source="Resources/Save.png"/>
-            </StatusBarItem>
-        </StatusBar>
-        
+
     </Grid>
 </Window>

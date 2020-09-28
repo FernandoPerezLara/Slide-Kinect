@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
@@ -22,18 +21,6 @@ namespace Slide_Kinect {
         }
 
         private enum cameraMode { color, infrared, depth }
-
-        private void frm_Main_KeyDown(object sender, System.Windows.Input.KeyEventArgs e) {
-            if (Keyboard.IsKeyDown(Key.LeftAlt) && (Keyboard.IsKeyDown(Key.D))) {
-                depurationMode = !depurationMode;
-
-                if (depurationMode == true) {
-                    stb_Depuration.Visibility = Visibility.Visible;
-                } else {
-                    stb_Depuration.Visibility = Visibility.Hidden;
-                }
-            }
-        }
 
         private void btn_Switch_Click(object sender, RoutedEventArgs e) {
             if (isOpen == false) {
@@ -88,10 +75,6 @@ namespace Slide_Kinect {
             isOpen = false;
         }
 
-        private void sendMessage(string content) {
-            txt_Output.Text = content;
-        }
-
         private void KinectReader_MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e) {
             var reference = e.FrameReference.AcquireFrame();
 
@@ -132,7 +115,6 @@ namespace Slide_Kinect {
         private void interfaceStatus(int status) {
             switch (status) {
                 case 0:
-                    sendMessage("Kinnect connected");
                     lbl_Status.Foreground = Brushes.Green;
                     lbl_Status.Content = "Connected";
                     lbl_KinectID.Foreground = Brushes.Black;
@@ -177,14 +159,12 @@ namespace Slide_Kinect {
 
                     break;
                 case 1:
-                    sendMessage("Connecting Kinect");
                     btn_Switch.Content = "Stop";
                     lbl_Status.Foreground = Brushes.Orange;
                     lbl_Status.Content = "Connecting";
 
                     break;
                 case 2:
-                    sendMessage("Kinect disconnected");
                     btn_Switch.Content = "Start";
                     lbl_Status.Foreground = Brushes.Red;
                     lbl_Status.Content = "Disconnected";
@@ -226,6 +206,7 @@ namespace Slide_Kinect {
 
     public static class CameraReader {
         [DllImport("user32.dll")]
+
         public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, uint dwExtraInfo);
         public static bool changeSlide = false;
 
