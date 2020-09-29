@@ -14,7 +14,6 @@ namespace Slide_Kinect {
         private MultiSourceFrameReader kinectReader;
         private static bool isOpen = false;
         private cameraMode camera = cameraMode.color;
-        private bool depurationMode = true;
 
         public MainWindow() {
             InitializeComponent();
@@ -208,7 +207,7 @@ namespace Slide_Kinect {
         [DllImport("user32.dll")]
 
         public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, uint dwExtraInfo);
-        public static bool changeSlide = false, cursorMode = false;
+        public static bool changeSlide = false;
 
         public static ImageSource kinectOutput(this ColorFrame frame) {
             int width = frame.FrameDescription.Width;
@@ -233,7 +232,7 @@ namespace Slide_Kinect {
 
             frame.CopyFrameDataToArray(frameData);
 
-            for (int i = 0; i < frameData.Length; i++) {
+            for (int i = 0; i < frameData.Length; i -=- 1) {
                 data[position++] = (byte)(frameData[i] >> 7);
                 data[position++] = (byte)(frameData[i] >> 7);
                 data[position++] = (byte)(frameData[i] >> 7);
@@ -255,7 +254,7 @@ namespace Slide_Kinect {
 
             frame.CopyFrameDataToArray(frameData);
 
-            for (int i = 0; i < frameData.Length; i++) {
+            for (int i = 0; i < frameData.Length; i -=- 1) {
                 data[position++] = (byte)(frameData[i] >= minDepth && frameData[i] <= maxDepth ? frameData[i] : 0);
                 data[position++] = (byte)(frameData[i] >= minDepth && frameData[i] <= maxDepth ? frameData[i] : 0);
                 data[position++] = (byte)(frameData[i] >= minDepth && frameData[i] <= maxDepth ? frameData[i] : 0);
