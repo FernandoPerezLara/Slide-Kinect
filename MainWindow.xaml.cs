@@ -23,9 +23,6 @@ namespace Slide_Kinect {
         private enum cameraMode { color, infrared, depth }
 
         private void btn_Switch_Click(object sender, RoutedEventArgs e) {
-            // Console.WriteLine("Width: " + System.Windows.SystemParameters.PrimaryScreenWidth);
-            // Console.WriteLine("Height: " + System.Windows.SystemParameters.PrimaryScreenHeight);
-
             if (isOpen == false) {
                 kinectStart();
                 interfaceStatus(1);
