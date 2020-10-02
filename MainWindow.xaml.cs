@@ -13,6 +13,7 @@ namespace Slide_Kinect {
         private KinectSensor kinectSensor;
         private MultiSourceFrameReader kinectReader;
         private static bool isOpen = false;
+        private static bool isConnected = false;
         private cameraMode camera = cameraMode.color;
 
         public MainWindow() {
@@ -22,6 +23,9 @@ namespace Slide_Kinect {
         private enum cameraMode { color, infrared, depth }
 
         private void btn_Switch_Click(object sender, RoutedEventArgs e) {
+            // Console.WriteLine("Width: " + System.Windows.SystemParameters.PrimaryScreenWidth);
+            // Console.WriteLine("Height: " + System.Windows.SystemParameters.PrimaryScreenHeight);
+
             if (isOpen == false) {
                 kinectStart();
                 interfaceStatus(1);
@@ -60,8 +64,8 @@ namespace Slide_Kinect {
 
             if (kinectSensor != null) {
                 kinectReader = kinectSensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Infrared | FrameSourceTypes.Depth | FrameSourceTypes.Body);
-                kinectReader.MultiSourceFrameArrived += KinectReader_MultiSourceFrameArrived; ;
-
+                kinectReader.MultiSourceFrameArrived += KinectReader_MultiSourceFrameArrived;
+                
                 kinectSensor.Open();
             }
 
@@ -77,7 +81,11 @@ namespace Slide_Kinect {
         private void KinectReader_MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e) {
             var reference = e.FrameReference.AcquireFrame();
 
-            interfaceStatus(0);
+            if (isConnected == false) {
+                interfaceStatus(0);
+            }
+
+            isConnected = true;
 
             using (var frame = reference.ColorFrameReference.AcquireFrame()) {
                 if (frame != null) {
@@ -106,7 +114,7 @@ namespace Slide_Kinect {
             using (var frame = reference.BodyFrameReference.AcquireFrame()) {
                 if (frame != null) {
                     cnv_Video.Children.Clear();
-                    cnv_Video.bodyPosition(frame, lbl_WorldXRight, lbl_WorldYRight, lbl_WorldZRight, lbl_WorldXLeft, lbl_WorldYLeft, lbl_WorldZLeft, cbx_Skeleton, cbx_NextSlide, cbx_PreviousSlide, cbx_CursorMode);
+                    cnv_Video.bodyPosition(frame, lbl_WorldXRight, lbl_WorldYRight, lbl_WorldZRight, lbl_WorldXLeft, lbl_WorldYLeft, lbl_WorldZLeft, lbl_RelativeXRight, lbl_RelativeYRight, cbx_Skeleton, cbx_NextSlide, cbx_PreviousSlide, cbx_CursorMode);
                 }
             }
         }
@@ -208,6 +216,12 @@ namespace Slide_Kinect {
 
         public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, uint dwExtraInfo);
         public static bool changeSlide = false;
+        public static int screenWidth = (int)SystemParameters.PrimaryScreenWidth;
+        public static int screenHeight = (int)SystemParameters.PrimaryScreenHeight;
+        public static double minVirtualWidth = -0.3;
+        public static double maxVirtualWidth = 0.4;
+        public static double minVirtualHeight = -0.2;
+        public static double maxVirtualHeight = 0.4;
 
         public static ImageSource kinectOutput(this ColorFrame frame) {
             int width = frame.FrameDescription.Width;
@@ -265,7 +279,7 @@ namespace Slide_Kinect {
             return BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgr32, null, data, width * PixelFormats.Bgr32.BitsPerPixel / 8);
         }
 
-        public static void bodyPosition(this Canvas cnv_Video, BodyFrame frame, Label lbl_WorldXRight, Label lbl_WorldYRight, Label lbl_WorldZRight, Label lbl_WorldXLeft, Label lbl_WorldYLeft, Label lbl_WorldZLeft, CheckBox cbx_Skeleton, CheckBox cbx_NextSlide, CheckBox cbx_PreviousSlide, CheckBox cbx_CursorMode) {
+        public static void bodyPosition(this Canvas cnv_Video, BodyFrame frame, Label lbl_WorldXRight, Label lbl_WorldYRight, Label lbl_WorldZRight, Label lbl_WorldXLeft, Label lbl_WorldYLeft, Label lbl_WorldZLeft, Label lbl_RelativeXRight, Label lbl_RelativeYRight, CheckBox cbx_Skeleton, CheckBox cbx_NextSlide, CheckBox cbx_PreviousSlide, CheckBox cbx_CursorMode) {
             IList<Body> bodies = new Body[frame.BodyFrameSource.BodyCount];
             IReadOnlyDictionary<JointType, Joint> joints;
 
@@ -282,6 +296,14 @@ namespace Slide_Kinect {
                     lbl_WorldXLeft.Content = (joints[JointType.HandTipLeft].Position.X).ToString("0.00");
                     lbl_WorldYLeft.Content = (joints[JointType.HandTipLeft].Position.Y).ToString("0.00");
                     lbl_WorldZLeft.Content = (joints[JointType.HandTipLeft].Position.Z).ToString("0.00");
+
+                    if ((joints[JointType.HandTipRight].Position.X >= minVirtualWidth) && (joints[JointType.HandTipRight].Position.X <= maxVirtualWidth)) {
+                        lbl_RelativeXRight.Content = (screenWidth * (-minVirtualWidth + joints[JointType.HandTipRight].Position.X) / (maxVirtualWidth - minVirtualWidth)).ToString("0");
+                    }
+
+                    if ((joints[JointType.HandTipRight].Position.Y >= minVirtualHeight) && (joints[JointType.HandTipRight].Position.Y <= maxVirtualHeight)) {
+                        lbl_RelativeYRight.Content = (screenHeight * (-minVirtualHeight + joints[JointType.HandTipRight].Position.Y) / (maxVirtualHeight - minVirtualHeight)).ToString("0");
+                    }
 
                     readHands(joints, cnv_Video, cbx_NextSlide, cbx_PreviousSlide, cbx_CursorMode);
 
@@ -327,11 +349,6 @@ namespace Slide_Kinect {
 
             if ((Math.Abs(leftHand.X - leftElbow.X) <= 0.05) && (leftHand.Y > leftElbow.Y) && (Math.Abs(leftHand.Z - leftElbow.Z) <= 0.1)) {
                 shakeHand(joints[JointType.HandRight].Position, joints[JointType.ElbowRight].Position, cbx_NextSlide, cbx_PreviousSlide, cbx_CursorMode);
-                cnv_Video.Background = Brushes.Green;
-                cnv_Video.Opacity = 0.2;
-            } else {
-                cnv_Video.Background = Brushes.Red;
-                cnv_Video.Opacity = 0.2;
             }
         }
 
