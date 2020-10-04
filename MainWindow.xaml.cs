@@ -1,113 +1,125 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Microsoft.Kinect;
 
 namespace Slide_Kinect {
     public partial class MainWindow : Window {
-        private KinectSensor kinectSensor;
-        private MultiSourceFrameReader kinectReader;
-        private static bool isOpen = false;
-        private static bool isConnected = false;
-        private cameraMode camera = cameraMode.color;
+        private KinectSensor kinectSensor; // Kinect device
+        private MultiSourceFrameReader kinectReader; // Reader for multi source frames
+        private properties kinectProperties; // Kinect properties
+
+        // Properties struct
+        private struct properties {
+            public enum statusType { connected, connecting, disconnected };
+            public enum cameraType { color, infrared, depth };
+
+            public statusType status;
+            public cameraType camera;
+        };
 
         public MainWindow() {
             InitializeComponent();
         }
 
-        private enum cameraMode { color, infrared, depth }
-
-        private void btn_Switch_Click(object sender, RoutedEventArgs e) {
-            if (isOpen == false) {
-                kinectStart();
-                interfaceStatus(1);
-            } else {
-                kinectStop();
-                interfaceStatus(2);
-            }
+        // When the from is loaded
+        private void frm_Main_Loaded(object sender, RoutedEventArgs e) {
+            kinectProperties.status = properties.statusType.disconnected; // set status to disconnected
+            kinectProperties.camera = properties.cameraType.color; // Set camera type to color
         }
 
-        private void rdb_RGBColor_Checked(object sender, RoutedEventArgs e) {
-            camera = cameraMode.color;
-        }
-
-        private void rdb_Infrared_Checked(object sender, RoutedEventArgs e) {
-            camera = cameraMode.infrared;
-        }
-
-        private void rdb_Depth_Checked(object sender, RoutedEventArgs e) {
-            camera = cameraMode.depth;
-        }
-
+        // When the form closes
         private void frm_Main_Closed(object sender, EventArgs e) {
             if (kinectReader != null) {
                 kinectReader.Dispose();
             }
 
             if (kinectSensor != null) {
-                kinectSensor.Close();
+                kinectSensor.Close(); // Stop the Kinect
             }
-
-            interfaceStatus(2);
         }
 
+        // When button is pressed
+        private void btn_Switch_Click(object sender, RoutedEventArgs e) {
+            if (kinectProperties.status == properties.statusType.disconnected) {
+                interfaceStatus(1); // Connecting status
+                kinectStart(); // Start Kinect
+            } else {
+                kinectStop(); // Stop Kinect
+                interfaceStatus(2); // Disconnected status
+            }
+        }
+
+        // Set camera mode to color
+        private void rdb_RGBColor_Checked(object sender, RoutedEventArgs e) {
+            kinectProperties.camera = properties.cameraType.color;
+        }
+
+        // Set camera mode to infrared
+        private void rdb_Infrared_Checked(object sender, RoutedEventArgs e) {
+            kinectProperties.camera = properties.cameraType.infrared;
+        }
+
+        // Set camera mode to depth
+        private void rdb_Depth_Checked(object sender, RoutedEventArgs e) {
+            kinectProperties.camera = properties.cameraType.depth;
+        }
+
+        // Starts the Kinect
         private void kinectStart() {
-            kinectSensor = KinectSensor.GetDefault();
+            kinectSensor = KinectSensor.GetDefault(); // Gets the default sensor
 
-            if (kinectSensor != null) {
-                kinectReader = kinectSensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Infrared | FrameSourceTypes.Depth | FrameSourceTypes.Body);
-                kinectReader.MultiSourceFrameArrived += KinectReader_MultiSourceFrameArrived;
-                
-                kinectSensor.Open();
+            if (kinectSensor != null) { // If Kinect exists
+                kinectSensor.Open(); // Open the Kinect
+
+                kinectReader = kinectSensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Infrared | FrameSourceTypes.Depth | FrameSourceTypes.Body); // Open the multi source frame reader
+                kinectReader.MultiSourceFrameArrived += KinectReader_MultiSourceFrameArrived; // When frame is captured the program fires an event
             }
-
-            isOpen = true;
         }
 
+        // Stops the Kinect
         private void kinectStop() {
-            kinectSensor.Close();
-
-            isOpen = false;
+            kinectSensor.Close(); // Stop the Kinect
         }
 
+        // Multi source frame reader
         private void KinectReader_MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e) {
-            var reference = e.FrameReference.AcquireFrame();
+            var reference = e.FrameReference.AcquireFrame(); // Gets the current frame
 
-            if (isConnected == false) {
+            // If Kinect is working, change to connected status
+            if (kinectProperties.status != properties.statusType.connected) {
                 interfaceStatus(0);
             }
 
-            isConnected = true;
-
+            // RGB camera
             using (var frame = reference.ColorFrameReference.AcquireFrame()) {
                 if (frame != null) {
-                    if (camera == cameraMode.color) {
+                    if (kinectProperties.camera == properties.cameraType.color) {
                         img_Video.Source = frame.kinectOutput();
                     }
                 }
             }
 
+            // Infrered camera
             using (var frame = reference.InfraredFrameReference.AcquireFrame()) {
                 if (frame != null) {
-                    if (camera == cameraMode.infrared) {
+                    if (kinectProperties.camera == properties.cameraType.infrared) {
                         img_Video.Source = frame.kinectOutput();
                     }
                 }
             }
 
+            // Depth camera
             using (var frame = reference.DepthFrameReference.AcquireFrame()) {
                 if (frame != null) {
-                    if (camera == cameraMode.depth) {
+                    if (kinectProperties.camera == properties.cameraType.depth) {
                         img_Video.Source = frame.kinectOutput();
                     }
                 }
             }
 
+            // Body tracker
             using (var frame = reference.BodyFrameReference.AcquireFrame()) {
                 if (frame != null) {
                     cnv_Video.Children.Clear();
@@ -116,13 +128,18 @@ namespace Slide_Kinect {
             }
         }
 
+        // Shows the status of the Kinect
         private void interfaceStatus(int status) {
             switch (status) {
-                case 0:
+                case 0: // Case connected
+                    // Set status
+                    kinectProperties.status = properties.statusType.connected;
+                    // Metadata section
                     lbl_Status.Foreground = Brushes.Green;
                     lbl_Status.Content = "Connected";
                     lbl_KinectID.Foreground = Brushes.Black;
                     lbl_KinectID.Content = kinectSensor.UniqueKinectId;
+                    // World labels
                     lbl_WorldXRight.Foreground = Brushes.Black;
                     lbl_WorldXRight.Content = "0.00";
                     lbl_WorldYRight.Foreground = Brushes.Black;
@@ -147,33 +164,40 @@ namespace Slide_Kinect {
                     lbl_WorldYLeft.Content = "0.00";
                     lbl_WorldZLeft.Foreground = Brushes.Black;
                     lbl_WorldZLeft.Content = "0.00";
+                    // Relative labels
                     lbl_RelativeXRight.Foreground = Brushes.Black;
-                    lbl_RelativeXRight.Content = "0.00";
+                    lbl_RelativeXRight.Content = "0";
                     lbl_RelativeYRight.Foreground = Brushes.Black;
-                    lbl_RelativeYRight.Content = "0.00";
-                    lbl_RelativeZRight.Foreground = Brushes.Black;
-                    lbl_RelativeZRight.Content = "0.00";
+                    lbl_RelativeYRight.Content = "0";
                     lbl_RelativeXLeft.Foreground = Brushes.Black;
-                    lbl_RelativeXLeft.Content = "0.00";
+                    lbl_RelativeXLeft.Content = "0";
                     lbl_RelativeYLeft.Foreground = Brushes.Black;
-                    lbl_RelativeYLeft.Content = "0.00";
-                    lbl_RelativeZLeft.Foreground = Brushes.Black;
-                    lbl_RelativeZLeft.Content = "0.00";
+                    lbl_RelativeYLeft.Content = "0";
+                    // Image stretch
                     img_Video.Stretch = Stretch.UniformToFill;
 
                     break;
-                case 1:
+                case 1: // Case connecting
+                    // Set status
+                    kinectProperties.status = properties.statusType.connecting;
+                    // Button content
                     btn_Switch.Content = "Stop";
+                    // Metadata section
                     lbl_Status.Foreground = Brushes.Orange;
                     lbl_Status.Content = "Connecting";
 
                     break;
-                case 2:
+                case 2: // Case disconnected
+                    // Set status
+                    kinectProperties.status = properties.statusType.disconnected;
+                    // Button content
                     btn_Switch.Content = "Start";
+                    // Metadata section
                     lbl_Status.Foreground = Brushes.Red;
                     lbl_Status.Content = "Disconnected";
                     lbl_KinectID.Foreground = Brushes.Red;
                     lbl_KinectID.Content = "Not provided";
+                    // World labels
                     lbl_WorldXRight.Foreground = Brushes.Red;
                     lbl_WorldXRight.Content = "NULL";
                     lbl_WorldYRight.Foreground = Brushes.Red;
@@ -186,18 +210,16 @@ namespace Slide_Kinect {
                     lbl_WorldYLeft.Content = "NULL";
                     lbl_WorldZLeft.Foreground = Brushes.Red;
                     lbl_WorldZLeft.Content = "NULL";
+                    // Relative labels
                     lbl_RelativeXRight.Foreground = Brushes.Red;
                     lbl_RelativeXRight.Content = "NULL";
                     lbl_RelativeYRight.Foreground = Brushes.Red;
                     lbl_RelativeYRight.Content = "NULL";
-                    lbl_RelativeZRight.Foreground = Brushes.Red;
-                    lbl_RelativeZRight.Content = "NULL";
                     lbl_RelativeXLeft.Foreground = Brushes.Red;
                     lbl_RelativeXLeft.Content = "NULL";
                     lbl_RelativeYLeft.Foreground = Brushes.Red;
                     lbl_RelativeYLeft.Content = "NULL";
-                    lbl_RelativeZLeft.Foreground = Brushes.Red;
-                    lbl_RelativeZLeft.Content = "NULL";
+                    // Image stretch
                     img_Video.Stretch = Stretch.None;
                     img_Video.Source = new BitmapImage(new Uri(@"/Resources/Camera.png", UriKind.Relative));
                     img_Video.Stretch = Stretch.None;
@@ -205,242 +227,6 @@ namespace Slide_Kinect {
 
                     break;
             }
-        }
-    }
-
-    public static class CameraReader {
-        [DllImport("user32.dll")]
-
-        public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, uint dwExtraInfo);
-        public static bool changeSlide = false;
-        public static int screenWidth = (int)SystemParameters.PrimaryScreenWidth;
-        public static int screenHeight = (int)SystemParameters.PrimaryScreenHeight;
-        public static double minVirtualWidth = -0.3;
-        public static double maxVirtualWidth = 0.4;
-        public static double minVirtualHeight = -0.2;
-        public static double maxVirtualHeight = 0.4;
-
-        public static ImageSource kinectOutput(this ColorFrame frame) {
-            int width = frame.FrameDescription.Width;
-            int height = frame.FrameDescription.Height;
-            byte[] data = new byte[width * height * ((PixelFormats.Bgr32.BitsPerPixel + 7) / 8)];
-
-            if (frame.RawColorImageFormat == ColorImageFormat.Bgra) {
-                frame.CopyRawFrameDataToArray(data);
-            } else {
-                frame.CopyConvertedFrameDataToArray(data, ColorImageFormat.Bgra);
-            }
-
-            return BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgr32, null, data, width * PixelFormats.Bgr32.BitsPerPixel / 8);
-        }
-
-        public static ImageSource kinectOutput(this InfraredFrame frame) {
-            int width = frame.FrameDescription.Width;
-            int height = frame.FrameDescription.Height;
-            byte[] data = new byte[width * height * (PixelFormats.Bgr32.BitsPerPixel + 7) / 8];
-            ushort[] frameData = new ushort[width * height];
-            int position = 0;
-
-            frame.CopyFrameDataToArray(frameData);
-
-            for (int i = 0; i < frameData.Length; i -=- 1) {
-                data[position++] = (byte)(frameData[i] >> 7);
-                data[position++] = (byte)(frameData[i] >> 7);
-                data[position++] = (byte)(frameData[i] >> 7);
-
-                position++;
-            }
-
-            return BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgr32, null, data, width * PixelFormats.Bgr32.BitsPerPixel / 8);
-        }
-
-        public static ImageSource kinectOutput(this DepthFrame frame) {
-            int width = frame.FrameDescription.Width;
-            int height = frame.FrameDescription.Height;
-            byte[] data = new byte[width * height * (PixelFormats.Bgr32.BitsPerPixel + 7) / 8];
-            ushort[] frameData = new ushort[width * height];
-            ushort minDepth = frame.DepthMinReliableDistance;
-            ushort maxDepth = frame.DepthMaxReliableDistance;
-            int position = 0;
-
-            frame.CopyFrameDataToArray(frameData);
-
-            for (int i = 0; i < frameData.Length; i -=- 1) {
-                data[position++] = (byte)(frameData[i] >= minDepth && frameData[i] <= maxDepth ? frameData[i] : 0);
-                data[position++] = (byte)(frameData[i] >= minDepth && frameData[i] <= maxDepth ? frameData[i] : 0);
-                data[position++] = (byte)(frameData[i] >= minDepth && frameData[i] <= maxDepth ? frameData[i] : 0);
-
-                position++;
-            }
-
-            return BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgr32, null, data, width * PixelFormats.Bgr32.BitsPerPixel / 8);
-        }
-
-        public static void bodyPosition(this Canvas cnv_Video, BodyFrame frame, Label lbl_WorldXRight, Label lbl_WorldYRight, Label lbl_WorldZRight, Label lbl_WorldXLeft, Label lbl_WorldYLeft, Label lbl_WorldZLeft, Label lbl_RelativeXRight, Label lbl_RelativeYRight, CheckBox cbx_Skeleton, CheckBox cbx_NextSlide, CheckBox cbx_PreviousSlide, CheckBox cbx_CursorMode) {
-            IList<Body> bodies = new Body[frame.BodyFrameSource.BodyCount];
-            IReadOnlyDictionary<JointType, Joint> joints;
-
-            frame.GetAndRefreshBodyData(bodies);
-
-            foreach (Body body in bodies) {
-                if (body != null && body.IsTracked) {
-                    joints = body.Joints;
-
-                    lbl_WorldXRight.Content = (joints[JointType.HandTipRight].Position.X).ToString("0.00");
-                    lbl_WorldYRight.Content = (joints[JointType.HandTipRight].Position.Y).ToString("0.00");
-                    lbl_WorldZRight.Content = (joints[JointType.HandTipRight].Position.Z).ToString("0.00");
-
-                    lbl_WorldXLeft.Content = (joints[JointType.HandTipLeft].Position.X).ToString("0.00");
-                    lbl_WorldYLeft.Content = (joints[JointType.HandTipLeft].Position.Y).ToString("0.00");
-                    lbl_WorldZLeft.Content = (joints[JointType.HandTipLeft].Position.Z).ToString("0.00");
-
-                    if ((joints[JointType.HandTipRight].Position.X >= minVirtualWidth) && (joints[JointType.HandTipRight].Position.X <= maxVirtualWidth)) {
-                        lbl_RelativeXRight.Content = (screenWidth * (-minVirtualWidth + joints[JointType.HandTipRight].Position.X) / (maxVirtualWidth - minVirtualWidth)).ToString("0");
-                    }
-
-                    if ((joints[JointType.HandTipRight].Position.Y >= minVirtualHeight) && (joints[JointType.HandTipRight].Position.Y <= maxVirtualHeight)) {
-                        lbl_RelativeYRight.Content = (screenHeight * (-minVirtualHeight + joints[JointType.HandTipRight].Position.Y) / (maxVirtualHeight - minVirtualHeight)).ToString("0");
-                    }
-
-                    readHands(joints, cnv_Video, cbx_NextSlide, cbx_PreviousSlide, cbx_CursorMode);
-
-                    if (cbx_Skeleton.IsChecked == true) {
-                        foreach (Joint joint in body.Joints.Values) {
-                            cnv_Video.drawNode(joint);
-                        }
-
-                        cnv_Video.drawLine(body.Joints[JointType.Head], body.Joints[JointType.Neck]);
-                        cnv_Video.drawLine(body.Joints[JointType.Neck], body.Joints[JointType.SpineShoulder]);
-                        cnv_Video.drawLine(body.Joints[JointType.SpineShoulder], body.Joints[JointType.ShoulderLeft]);
-                        cnv_Video.drawLine(body.Joints[JointType.SpineShoulder], body.Joints[JointType.ShoulderRight]);
-                        cnv_Video.drawLine(body.Joints[JointType.SpineShoulder], body.Joints[JointType.SpineMid]);
-                        cnv_Video.drawLine(body.Joints[JointType.ShoulderLeft], body.Joints[JointType.ElbowLeft]);
-                        cnv_Video.drawLine(body.Joints[JointType.ShoulderRight], body.Joints[JointType.ElbowRight]);
-                        cnv_Video.drawLine(body.Joints[JointType.ElbowLeft], body.Joints[JointType.WristLeft]);
-                        cnv_Video.drawLine(body.Joints[JointType.ElbowRight], body.Joints[JointType.WristRight]);
-                        cnv_Video.drawLine(body.Joints[JointType.WristLeft], body.Joints[JointType.HandLeft]);
-                        cnv_Video.drawLine(body.Joints[JointType.WristRight], body.Joints[JointType.HandRight]);
-                        cnv_Video.drawLine(body.Joints[JointType.HandLeft], body.Joints[JointType.HandTipLeft]);
-                        cnv_Video.drawLine(body.Joints[JointType.HandRight], body.Joints[JointType.HandTipRight]);
-                        cnv_Video.drawLine(body.Joints[JointType.HandTipLeft], body.Joints[JointType.ThumbLeft]);
-                        cnv_Video.drawLine(body.Joints[JointType.HandTipRight], body.Joints[JointType.ThumbRight]);
-                        cnv_Video.drawLine(body.Joints[JointType.SpineMid], body.Joints[JointType.SpineBase]);
-                        cnv_Video.drawLine(body.Joints[JointType.SpineBase], body.Joints[JointType.HipLeft]);
-                        cnv_Video.drawLine(body.Joints[JointType.SpineBase], body.Joints[JointType.HipRight]);
-                        cnv_Video.drawLine(body.Joints[JointType.HipLeft], body.Joints[JointType.KneeLeft]);
-                        cnv_Video.drawLine(body.Joints[JointType.HipRight], body.Joints[JointType.KneeRight]);
-                        cnv_Video.drawLine(body.Joints[JointType.KneeLeft], body.Joints[JointType.AnkleLeft]);
-                        cnv_Video.drawLine(body.Joints[JointType.KneeRight], body.Joints[JointType.AnkleRight]);
-                        cnv_Video.drawLine(body.Joints[JointType.AnkleLeft], body.Joints[JointType.FootLeft]);
-                        cnv_Video.drawLine(body.Joints[JointType.AnkleRight], body.Joints[JointType.FootRight]);
-                    }
-                }
-            }
-        }
-
-        public static void readHands(IReadOnlyDictionary<JointType, Joint> joints, Canvas cnv_Video, CheckBox cbx_NextSlide, CheckBox cbx_PreviousSlide, CheckBox cbx_CursorMode) {
-            CameraSpacePoint leftHand, leftElbow;
-                
-            leftHand = joints[JointType.HandLeft].Position;
-            leftElbow = joints[JointType.ElbowLeft].Position;
-
-            if ((Math.Abs(leftHand.X - leftElbow.X) <= 0.05) && (leftHand.Y > leftElbow.Y) && (Math.Abs(leftHand.Z - leftElbow.Z) <= 0.1)) {
-                shakeHand(joints[JointType.HandRight].Position, joints[JointType.ElbowRight].Position, cbx_NextSlide, cbx_PreviousSlide, cbx_CursorMode);
-            }
-        }
-
-
-
-        public static void shakeHand(CameraSpacePoint rightHand, CameraSpacePoint rightElbow, CheckBox cbx_NextSlide, CheckBox cbx_PreviousSlide, CheckBox cbx_CursorMode) {
-            if ((rightElbow.X - rightHand.X) >= 0.2) {
-                if (changeSlide == false) {
-                    if (cbx_NextSlide.IsChecked == true) {
-                        keybd_event((byte)0x27, 0, 0x0001 | 0, 0);
-                    }
-                    changeSlide = true;
-                }
-            } else if ((rightElbow.X - rightHand.X) <= -0.2) {
-                if (changeSlide == false) {
-                    if (cbx_PreviousSlide.IsChecked == true) {
-                        keybd_event((byte)0x25, 0, 0x0001 | 0, 0);
-                    }
-                    changeSlide = true;
-                }
-            } else if ((Math.Abs(rightElbow.Z - rightHand.Z) >= 0.3) && (Math.Abs(rightHand.Y - rightElbow.Y) <= 0.1) && (Math.Abs(rightHand.X - rightElbow.X) <= 0.1)) {
-                if (changeSlide == false) {
-                    if (cbx_CursorMode.IsChecked == true) {
-                        // Cursor mode activated
-                    }
-                    changeSlide = true;
-                }
-            } else {
-                if (changeSlide == true) {
-                    changeSlide = false;
-                }
-            }
-        }
-    }
-
-    public static class drawSkeleton {
-        public static void drawNode(this Canvas cnv_Video, Joint joint) {
-            joint = joint.scaleTo(cnv_Video.ActualWidth, cnv_Video.ActualHeight);
-
-            Ellipse ellipse = new Ellipse {
-                Width = 10,
-                Height = 10,
-                Fill = new SolidColorBrush(Colors.LightBlue)
-            };
-
-            Canvas.SetLeft(ellipse, joint.Position.X - ellipse.Width / 2);
-            Canvas.SetTop(ellipse, joint.Position.Y - ellipse.Height / 2);
-
-            cnv_Video.Children.Add(ellipse);
-        }
-
-        public static void drawLine(this Canvas canvas, Joint first, Joint second) {
-            if (first.TrackingState == TrackingState.NotTracked || second.TrackingState == TrackingState.NotTracked) return;
-
-            first = first.scaleTo(canvas.ActualWidth, canvas.ActualHeight);
-            second = second.scaleTo(canvas.ActualWidth, canvas.ActualHeight);
-
-            Line line = new Line {
-                X1 = first.Position.X,
-                Y1 = first.Position.Y,
-                X2 = second.Position.X,
-                Y2 = second.Position.Y,
-                StrokeThickness = 6,
-                Stroke = new SolidColorBrush(Colors.LightBlue)
-            };
-
-            canvas.Children.Add(line);
-        }
-
-        public static Joint scaleTo(this Joint joint, double width, double height, float skeletonMaxX, float skeletonMaxY) {
-            joint.Position = new CameraSpacePoint {
-                X = scale(width, skeletonMaxX, joint.Position.X),
-                Y = scale(height, skeletonMaxY, -joint.Position.Y),
-                Z = joint.Position.Z
-            };
-
-            return joint;
-        }
-
-        public static Joint scaleTo(this Joint joint, double width, double height) {
-            return scaleTo(joint, width, height, 1.0f, 1.0f);
-        }
-
-        private static float scale(double maxPixel, double maxSkeleton, float position) {
-            float value = (float)((((maxPixel / maxSkeleton) / 2) * position) + (maxPixel / 2));
-
-            if (value > maxPixel) {
-                return (float)maxPixel;
-            }
-
-            if (value < 0) {
-                return 0;
-            }
-
-            return value;
         }
     }
 }

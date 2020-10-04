@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Slide_Kinect"
         mc:Ignorable="d"
-        Title="Slide Kinect" Height="410" Width="670" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Closed="frm_Main_Closed">
+        Title="Slide Kinect" Height="410" Width="670" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Closed="frm_Main_Closed" Loaded="frm_Main_Loaded">
     <Grid>
         <StackPanel HorizontalAlignment="Left" Margin="12,12,0,0" VerticalAlignment="Top" Orientation="Horizontal">
             <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
@@ -80,10 +80,7 @@
                                 <Label Content="Relative Y:"/>
                                 <Label x:Name="lbl_RelativeYRight" Content="NULL" Foreground="Red"/>
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="Relative Z:"/>
-                                <Label x:Name="lbl_RelativeZRight" Content="NULL" Foreground="Red"/>
-                            </StackPanel>
+                            <StackPanel Orientation="Horizontal"/>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
@@ -115,10 +112,7 @@
                                 <Label Content="Relative Y:"/>
                                 <Label x:Name="lbl_RelativeYLeft" Content="NULL" Foreground="Red"/>
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="Relative Z:"/>
-                                <Label x:Name="lbl_RelativeZLeft" Content="NULL" Foreground="Red"/>
-                            </StackPanel>
+                            <StackPanel Orientation="Horizontal"/>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
