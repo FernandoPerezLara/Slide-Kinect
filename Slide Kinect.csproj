@@ -98,11 +98,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\Save.png" />
+  </ItemGroup>
+  <ItemGroup>
     <Resource Include="Resources\Camera.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Save.png" />
+    <Resource Include="Resources\Settings.png" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

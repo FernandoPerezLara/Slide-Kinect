@@ -19,12 +19,12 @@
                     <GroupBox Header="View Mode" HorizontalAlignment="Left" VerticalAlignment="Top">
                         <StackPanel Margin="10,10,12,10" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
                             <StackPanel VerticalAlignment="Center" Margin="0,0,20,0">
-                                <RadioButton x:Name="rdb_RGBColor" Content="RGB Color" Margin="0,0,0,8" IsChecked="True" Checked="rdb_RGBColor_Checked"/>
-                                <RadioButton x:Name="rdb_Infrared" Content="Infrared" Margin="0,0,0,8" Checked="rdb_Infrared_Checked"/>
+                                <RadioButton x:Name="rdb_RGBColor" Content="RGB Color" Margin="0,0,0,8" Checked="rdb_RGBColor_Checked"/>
+                                <RadioButton x:Name="rdb_Infrared" Content="Infrared" Margin="0,0,0,8" IsChecked="True" Checked="rdb_Infrared_Checked"/>
                                 <RadioButton x:Name="rdb_Depth" Content="Depth" Margin="0,0,0,0" Checked="rdb_Depth_Checked"/>
                             </StackPanel>
                             <StackPanel VerticalAlignment="Center">
-                                <CheckBox x:Name="cbx_Skeleton" Content="Draw skeleton" Margin="0,0,0,8"/>
+                                <CheckBox x:Name="cbx_Skeleton" Content="Draw skeleton" Margin="0,0,0,8" IsChecked="True"/>
                                 <CheckBox x:Name="cbx_Outline" Content="Green screen" Margin="0,0,0,8" IsEnabled="False"/>
                                 <CheckBox x:Name="cbx_FingerPoints" Content="Draw finger points" IsEnabled="False"/>
                             </StackPanel>
@@ -34,7 +34,7 @@
                         <StackPanel Margin="10,10,12,10" HorizontalAlignment="Left" VerticalAlignment="Top">
                             <CheckBox x:Name="cbx_NextSlide" Content="Next slide" Margin="0,0,0,8" IsChecked="True"/>
                             <CheckBox x:Name="cbx_PreviousSlide" Content="Previous slide" Margin="0,0,0,8" IsChecked="True"/>
-                            <CheckBox x:Name="cbx_CursorMode" Content="Cursor mode"/>
+                            <CheckBox x:Name="cbx_CursorMode" Content="Cursor mode" IsChecked="True"/>
                         </StackPanel>
                     </GroupBox>
                 </StackPanel>
@@ -116,7 +116,14 @@
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
-                <Button x:Name="btn_Switch" Content="Start" HorizontalAlignment="Left" Height="37" VerticalAlignment="Top" Width="237" Click="btn_Switch_Click"/>
+                <StackPanel Orientation="Horizontal" Width="237" Height="37">
+                    <Button x:Name="btn_Configuration" HorizontalAlignment="Left" VerticalAlignment="Top" Height="37" Width="37">
+                        <StackPanel>
+                            <Image Source="Resources/Settings.png" Stretch="Fill" />
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="btn_Switch" Content="Start" HorizontalAlignment="Left" VerticalAlignment="Top" Click="btn_Switch_Click" Height="37" Width="188" Margin="12,0,0,0"/>
+                </StackPanel>
             </StackPanel>
         </StackPanel>
 

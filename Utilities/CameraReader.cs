@@ -16,6 +16,7 @@ namespace Slide_Kinect {
         public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, uint dwExtraInfo); // Virtual keyboard
 
         public static bool changeSlide = false; // Activated when slide is changing
+        public static bool cursorMode = false; // Activated when cursor mode is on
 
         // Virtual position properties
         public struct virtualProperties {
@@ -176,11 +177,9 @@ namespace Slide_Kinect {
             }
         }
 
-        public static bool cursorMode = false;
-
         // Detect movement of the primary hand
         public static void shakeHand(CameraSpacePoint rightHand, CameraSpacePoint rightElbow, CheckBox cbx_NextSlide, CheckBox cbx_PreviousSlide, CheckBox cbx_CursorMode) {
-            if (cursorMode == true) {
+            if ((cursorMode == true) && (cbx_CursorMode.IsChecked == true)) { // If cursor mode is on
                 SetCursorPos(virtualProperties.X, virtualProperties.Y); // Set cursor position
             } else {
                 if ((rightElbow.X - rightHand.X) >= 0.2) { // Move the right hand to the left

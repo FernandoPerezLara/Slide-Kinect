@@ -27,7 +27,7 @@ namespace Slide_Kinect {
         // When the from is loaded
         private void frm_Main_Loaded(object sender, RoutedEventArgs e) {
             kinectProperties.status = properties.statusType.disconnected; // set status to disconnected
-            kinectProperties.camera = properties.cameraType.color; // Set camera type to color            
+            kinectProperties.camera = properties.cameraType.infrared; // Set camera type to infrared            
         }
 
         // When the form closes
