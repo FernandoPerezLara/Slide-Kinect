@@ -9,9 +9,12 @@ using Microsoft.Kinect;
 
 namespace Slide_Kinect {
     internal static class CameraReader {
-        [DllImport("user32.dll")] // Library used to create a virtual keyboard
+        [DllImport("user32.dll")] // Library used to create a virtual mouse
+        public static extern void SetCursorPos(int X, int Y); // Virtual mouse
 
+        [DllImport("user32.dll")] // Library used to create a virtual keyboard
         public static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, uint dwExtraInfo); // Virtual keyboard
+
         public static bool changeSlide = false; // Activated when slide is changing
 
         // Virtual position properties
@@ -20,6 +23,8 @@ namespace Slide_Kinect {
             public static double[] heightRange = new double[] { -0.2, 0.4 };
             public static int screenWidth = (int)SystemParameters.PrimaryScreenWidth;
             public static int screenHeight = (int)SystemParameters.PrimaryScreenHeight;
+            public static int X;
+            public static int Y;
         };
 
         // Returns a color frame
@@ -104,12 +109,14 @@ namespace Slide_Kinect {
 
                     // Display relative position on labels
                     if ((joints[JointType.HandTipRight].Position.X >= virtualProperties.widthRange[0]) && (joints[JointType.HandTipRight].Position.X <= virtualProperties.widthRange[1])) {
-                        lbl_RelativeXRight.Content = (virtualProperties.screenWidth * (-virtualProperties.widthRange[0] + joints[JointType.HandTipRight].Position.X) / (virtualProperties.widthRange[1] - virtualProperties.widthRange[0])).ToString("0");
+                        virtualProperties.X = (int)(virtualProperties.screenWidth * (-virtualProperties.widthRange[0] + joints[JointType.HandTipRight].Position.X) / (virtualProperties.widthRange[1] - virtualProperties.widthRange[0]));
+                        lbl_RelativeXRight.Content = (virtualProperties.X).ToString("0");
                     }
 
                     // Display relative position on labels
                     if ((joints[JointType.HandTipRight].Position.Y >= virtualProperties.heightRange[0]) && (joints[JointType.HandTipRight].Position.Y <= virtualProperties.heightRange[1])) {
-                        lbl_RelativeYRight.Content = (virtualProperties.screenHeight * (-virtualProperties.heightRange[0] + joints[JointType.HandTipRight].Position.Y) / (virtualProperties.heightRange[1] - virtualProperties.heightRange[0])).ToString("0");
+                        virtualProperties.Y = virtualProperties.screenHeight - (int)(virtualProperties.screenHeight * (-virtualProperties.heightRange[0] + joints[JointType.HandTipRight].Position.Y) / (virtualProperties.heightRange[1] - virtualProperties.heightRange[0]));
+                        lbl_RelativeYRight.Content = (virtualProperties.Y).ToString("0");
                     }
 
                     // Read hands movement
@@ -164,35 +171,43 @@ namespace Slide_Kinect {
             // Check if activation mode is ready (secondary arm on 90 degrees)
             if ((Math.Abs(leftHand.X - leftElbow.X) <= 0.05) && (leftHand.Y > leftElbow.Y) && (Math.Abs(leftHand.Z - leftElbow.Z) <= 0.1)) {
                 shakeHand(rightHand, rightElbow, cbx_NextSlide, cbx_PreviousSlide, cbx_CursorMode); // Detect the movement of the main hand
+            } else {
+                cursorMode = false;
             }
         }
 
+        public static bool cursorMode = false;
+
         // Detect movement of the primary hand
         public static void shakeHand(CameraSpacePoint rightHand, CameraSpacePoint rightElbow, CheckBox cbx_NextSlide, CheckBox cbx_PreviousSlide, CheckBox cbx_CursorMode) {
-            if ((rightElbow.X - rightHand.X) >= 0.2) { // Move the right hand to the left
-                if (changeSlide == false) {
-                    if (cbx_NextSlide.IsChecked == true) {
-                        keybd_event(0x27, 0, 0x0001 | 0, 0); // Right arrow key
+            if (cursorMode == true) {
+                SetCursorPos(virtualProperties.X, virtualProperties.Y); // Set cursor position
+            } else {
+                if ((rightElbow.X - rightHand.X) >= 0.2) { // Move the right hand to the left
+                    if (changeSlide == false) {
+                        if (cbx_NextSlide.IsChecked == true) {
+                            keybd_event(0x27, 0, 0x0001 | 0, 0); // Right arrow key
+                        }
+                        changeSlide = true;
                     }
-                    changeSlide = true;
-                }
-            } else if ((rightElbow.X - rightHand.X) <= -0.2) { // Move the right hand to the right
-                if (changeSlide == false) {
-                    if (cbx_PreviousSlide.IsChecked == true) {
-                        keybd_event(0x25, 0, 0x0001 | 0, 0); // Left arrow key
+                } else if ((rightElbow.X - rightHand.X) <= -0.2) { // Move the right hand to the right
+                    if (changeSlide == false) {
+                        if (cbx_PreviousSlide.IsChecked == true) {
+                            keybd_event(0x25, 0, 0x0001 | 0, 0); // Left arrow key
+                        }
+                        changeSlide = true;
                     }
-                    changeSlide = true;
-                }
-            } else if ((Math.Abs(rightElbow.Z - rightHand.Z) >= 0.3) && (Math.Abs(rightHand.Y - rightElbow.Y) <= 0.1) && (Math.Abs(rightHand.X - rightElbow.X) <= 0.1)) { // Move hand forward
-                if (changeSlide == false) {
-                    if (cbx_CursorMode.IsChecked == true) {
-                        // Cursor mode activated
+                } else if ((Math.Abs(rightElbow.Z - rightHand.Z) >= 0.3) && (Math.Abs(rightHand.Y - rightElbow.Y) <= 0.1) && (Math.Abs(rightHand.X - rightElbow.X) <= 0.1)) { // Move hand forward
+                    if (changeSlide == false) {
+                        if (cbx_CursorMode.IsChecked == true) {
+                            cursorMode = true;
+                        }
+                        changeSlide = true;
                     }
-                    changeSlide = true;
-                }
-            } else { // It is at rest
-                if (changeSlide == true) {
-                    changeSlide = false;
+                } else { // It is at rest
+                    if (changeSlide == true) {
+                        changeSlide = false;
+                    }
                 }
             }
         }

@@ -5,6 +5,7 @@ using System.Windows.Media.Imaging;
 using Microsoft.Kinect;
 
 namespace Slide_Kinect {
+
     public partial class MainWindow : Window {
         private KinectSensor kinectSensor; // Kinect device
         private MultiSourceFrameReader kinectReader; // Reader for multi source frames
@@ -26,7 +27,7 @@ namespace Slide_Kinect {
         // When the from is loaded
         private void frm_Main_Loaded(object sender, RoutedEventArgs e) {
             kinectProperties.status = properties.statusType.disconnected; // set status to disconnected
-            kinectProperties.camera = properties.cameraType.color; // Set camera type to color
+            kinectProperties.camera = properties.cameraType.color; // Set camera type to color            
         }
 
         // When the form closes
