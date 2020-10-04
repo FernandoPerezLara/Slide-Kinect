@@ -5,6 +5,7 @@ using Microsoft.Kinect;
 
 namespace Slide_Kinect {
     internal static class drawSkeleton {
+        // Draw node
         public static void drawNode(this Canvas cnv_Video, Joint joint) {
             joint = joint.scaleTo(cnv_Video.ActualWidth, cnv_Video.ActualHeight);
 
@@ -20,6 +21,7 @@ namespace Slide_Kinect {
             cnv_Video.Children.Add(ellipse);
         }
 
+        // Draw line
         public static void drawLine(this Canvas canvas, Joint first, Joint second) {
             if (first.TrackingState == TrackingState.NotTracked || second.TrackingState == TrackingState.NotTracked) return;
 
