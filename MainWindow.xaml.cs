@@ -1,24 +1,16 @@
 ﻿using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.Kinect;
+using static Slide_Kinect.Utilities.Properties;
 
 namespace Slide_Kinect {
 
     public partial class MainWindow : Window {
         private KinectSensor kinectSensor; // Kinect device
         private MultiSourceFrameReader kinectReader; // Reader for multi source frames
-        private properties kinectProperties; // Kinect properties
-
-        // Properties struct
-        private struct properties {
-            public enum statusType { connected, connecting, disconnected };
-            public enum cameraType { color, infrared, depth };
-
-            public statusType status;
-            public cameraType camera;
-        };
 
         public MainWindow() {
             InitializeComponent();
@@ -27,7 +19,23 @@ namespace Slide_Kinect {
         // When the from is loaded
         private void frm_Main_Loaded(object sender, RoutedEventArgs e) {
             kinectProperties.status = properties.statusType.disconnected; // set status to disconnected
-            kinectProperties.camera = properties.cameraType.infrared; // Set camera type to infrared            
+            
+            if (rdb_RGBColor.IsChecked == true) {
+                kinectProperties.camera = properties.cameraType.color; // Set camera type to color
+            } else if (rdb_Infrared.IsChecked == true) {
+                kinectProperties.camera = properties.cameraType.infrared; // Set camera type to infrared
+            } else if (rdb_Depth.IsChecked == true) {
+                kinectProperties.camera = properties.cameraType.depth; // Set camera type to depth
+            }
+
+            Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Slide Kinect")); // Create a folder in Documents
+        
+            // Check if the file exists
+            if (File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Slide Kinect") + @"\configuration.json")) {
+                // File exists
+            } else {
+                LoadConfiguration.createProfile(LoadConfiguration.defaultConfiguration(), Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Slide Kinect") + @"\configuration.json");
+            }
         }
 
         // When the form closes
@@ -41,7 +49,7 @@ namespace Slide_Kinect {
             }
         }
 
-        // When button is pressed
+        // When start button is pressed
         private void btn_Switch_Click(object sender, RoutedEventArgs e) {
             if (kinectProperties.status == properties.statusType.disconnected) {
                 interfaceStatus(1); // Connecting status
@@ -50,6 +58,13 @@ namespace Slide_Kinect {
                 kinectStop(); // Stop Kinect
                 interfaceStatus(2); // Disconnected status
             }
+        }
+
+        // When configuration button is pressed
+        private void btn_Configuration_Click(object sender, RoutedEventArgs e) {
+            var popup = new ConfigurationWindow();
+
+            popup.ShowDialog(); // Show configuration window
         }
 
         // Set camera mode to color

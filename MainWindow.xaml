@@ -54,7 +54,7 @@
                 </GroupBox>
                 <GroupBox HorizontalAlignment="Left" VerticalAlignment="Top" Width="237" Margin="0,0,0,5">
                     <GroupBox.Header>
-                        <RadioButton Content="Right Handed" IsChecked="True" GroupName="Handed"/>
+                        <RadioButton x:Name="rdb_RightHanded" Content="Right Handed" IsChecked="True" GroupName="Handed"/>
                     </GroupBox.Header>
                     <StackPanel Margin="6,2,6,6" VerticalAlignment="Top" Orientation="Horizontal">
                         <StackPanel VerticalAlignment="Top">
@@ -86,7 +86,7 @@
                 </GroupBox>
                 <GroupBox HorizontalAlignment="Left" VerticalAlignment="Top" Width="237" Margin="0,0,0,12">
                     <GroupBox.Header>
-                        <RadioButton Content="Left Handed" GroupName="Handed"/>
+                        <RadioButton x:Name="rdb_LeftHanded" Content="Left Handed" GroupName="Handed"/>
                     </GroupBox.Header>
                     <StackPanel Margin="6,2,6,6" VerticalAlignment="Top" Orientation="Horizontal">
                         <StackPanel VerticalAlignment="Top">
@@ -117,7 +117,7 @@
                     </StackPanel>
                 </GroupBox>
                 <StackPanel Orientation="Horizontal" Width="237" Height="37">
-                    <Button x:Name="btn_Configuration" HorizontalAlignment="Left" VerticalAlignment="Top" Height="37" Width="37">
+                    <Button x:Name="btn_Configuration" HorizontalAlignment="Left" VerticalAlignment="Top" Height="37" Width="37" Click="btn_Configuration_Click">
                         <StackPanel>
                             <Image Source="Resources/Settings.png" Stretch="Fill" />
                         </StackPanel>

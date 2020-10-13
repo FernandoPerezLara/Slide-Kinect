@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows.Controls;
-using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.Kinect;
+using static Slide_Kinect.Utilities.Properties;
 
 namespace Slide_Kinect {
     internal static class CameraReader {
@@ -17,16 +17,6 @@ namespace Slide_Kinect {
 
         public static bool changeSlide = false; // Activated when slide is changing
         public static bool cursorMode = false; // Activated when cursor mode is on
-
-        // Virtual position properties
-        public struct virtualProperties {
-            public static double[] widthRange = new double[] { -0.3, 0.4 };
-            public static double[] heightRange = new double[] { -0.2, 0.4 };
-            public static int screenWidth = (int)SystemParameters.PrimaryScreenWidth;
-            public static int screenHeight = (int)SystemParameters.PrimaryScreenHeight;
-            public static int X;
-            public static int Y;
-        };
 
         // Returns a color frame
         public static ImageSource kinectOutput(this ColorFrame frame) {
